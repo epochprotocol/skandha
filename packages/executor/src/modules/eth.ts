@@ -124,9 +124,12 @@ export class Eth {
     return {
       preVerificationGas,
       verificationGas,
+      callGasLimit,
       validAfter,
       validUntil,
-      callGasLimit,
+      // validAfter,
+      // validUntil,
+
     };
   }
 
@@ -311,15 +314,9 @@ export class Eth {
       .reduce((sum, x) => sum + x);
     const ret = Math.round(
       callDataCost +
-<<<<<<< HEAD
       ov.fixed / ov.bundleSize +
       ov.perUserOp +
-      ov.perUserOpWord * packed.length
-=======
-        ov.fixed / ov.bundleSize +
-        ov.perUserOp +
-        ov.perUserOpWord * lengthInWord
->>>>>>> ef5041c9958204c3e22a6598f28c2c3329cd1d4c
+      ov.perUserOpWord * lengthInWord
     );
     return ret;
   }
