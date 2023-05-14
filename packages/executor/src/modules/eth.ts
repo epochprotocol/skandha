@@ -21,6 +21,7 @@ import {
   EstimateUserOperationGasArgs,
   SendUserOperationGasArgs,
 } from "./interfaces";
+import { CustomUserOperationStruct } from "types/src/executor/common";
 
 export class Eth {
   constructor(
@@ -29,7 +30,7 @@ export class Eth {
     private mempoolService: MempoolService,
     private config: NetworkConfig,
     private logger: Logger
-  ) {}
+  ) { }
 
   /**
    *
@@ -37,7 +38,7 @@ export class Eth {
    * @param entryPoint the entrypoint address the request should be sent through. this MUST be one of the entry points returned by the supportedEntryPoints rpc call.
    */
   async sendUserOperation(args: SendUserOperationGasArgs): Promise<string> {
-    const userOp = args.userOp as unknown as UserOperationStruct;
+    const userOp = args.userOp as unknown as CustomUserOperationStruct;
     const entryPoint = args.entryPoint;
     if (!this.validateEntryPoint(entryPoint)) {
       throw new RpcError("Invalid Entrypoint", RpcErrorCodes.INVALID_REQUEST);
@@ -297,9 +298,9 @@ export class Eth {
       .reduce((sum, x) => sum + x);
     const ret = Math.round(
       callDataCost +
-        ov.fixed / ov.bundleSize +
-        ov.perUserOp +
-        ov.perUserOpWord * packed.length
+      ov.fixed / ov.bundleSize +
+      ov.perUserOp +
+      ov.perUserOpWord * packed.length
     );
     return ret;
   }

@@ -4,10 +4,11 @@ import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
 import RpcError from "types/lib/api/errors/rpc-error";
 import { UserOperationStruct } from "types/lib/executor/contracts/EntryPoint";
 import { IMempoolEntry, MempoolEntrySerialized } from "./interfaces";
+import { CustomUserOperationStruct } from "types/src/executor/common";
 
 export class MempoolEntry implements IMempoolEntry {
   chainId: number;
-  userOp: UserOperationStruct;
+  userOp: CustomUserOperationStruct;
   entryPoint: string;
   prefund: BigNumberish;
   aggregator?: string;
@@ -23,7 +24,7 @@ export class MempoolEntry implements IMempoolEntry {
     hash,
   }: {
     chainId: number;
-    userOp: UserOperationStruct;
+    userOp: CustomUserOperationStruct;
     entryPoint: string;
     prefund: BigNumberish;
     aggregator?: string | undefined;

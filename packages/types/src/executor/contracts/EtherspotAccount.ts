@@ -17,6 +17,7 @@ import {
 import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
+import { CustomUserOperationStruct } from "../common";
 
 export type UserOperationStruct = {
   sender: string;
@@ -261,7 +262,7 @@ export interface EtherspotAccount extends BaseContract {
     ): Promise<ContractTransaction>;
 
     validateUserOp(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       userOpHash: BytesLike,
       aggregator: string,
       missingAccountFunds: BigNumberish,
@@ -319,7 +320,7 @@ export interface EtherspotAccount extends BaseContract {
   ): Promise<ContractTransaction>;
 
   validateUserOp(
-    userOp: UserOperationStruct,
+    userOp: CustomUserOperationStruct,
     userOpHash: BytesLike,
     aggregator: string,
     missingAccountFunds: BigNumberish,
@@ -372,7 +373,7 @@ export interface EtherspotAccount extends BaseContract {
     ): Promise<void>;
 
     validateUserOp(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       userOpHash: BytesLike,
       aggregator: string,
       missingAccountFunds: BigNumberish,
@@ -462,7 +463,7 @@ export interface EtherspotAccount extends BaseContract {
     ): Promise<BigNumber>;
 
     validateUserOp(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       userOpHash: BytesLike,
       aggregator: string,
       missingAccountFunds: BigNumberish,
@@ -521,7 +522,7 @@ export interface EtherspotAccount extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     validateUserOp(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       userOpHash: BytesLike,
       aggregator: string,
       missingAccountFunds: BigNumberish,

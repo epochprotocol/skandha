@@ -1,5 +1,6 @@
 import { BigNumberish, BytesLike } from "ethers";
 import { ReputationStatus } from "types/lib/executor";
+import { AdvancedUserOperation } from "types/src/executor/common";
 
 export class EstimateUserOperationStruct {
   sender!: string;
@@ -32,6 +33,7 @@ export class SendUserOperationStruct {
   paymasterAndData!: BytesLike;
   signature!: BytesLike;
   callGasLimit!: BigNumberish;
+  advancedUserOperation?: AdvancedUserOperation;
 }
 
 export class SendUserOperationGasArgs {

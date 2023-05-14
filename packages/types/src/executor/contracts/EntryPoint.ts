@@ -26,20 +26,21 @@ import type {
   TypedListener,
   OnEvent,
 } from "./common";
+import { CustomUserOperationStruct } from "../common";
 
-export type UserOperationStruct = {
-  sender: string;
-  nonce: BigNumberish;
-  initCode: BytesLike;
-  callData: BytesLike;
-  callGasLimit: BigNumberish;
-  verificationGasLimit: BigNumberish;
-  preVerificationGas: BigNumberish;
-  maxFeePerGas: BigNumberish;
-  maxPriorityFeePerGas: BigNumberish;
-  paymasterAndData: BytesLike;
-  signature: BytesLike;
-};
+// export type UserOperationStruct = {
+//   sender: string;
+//   nonce: BigNumberish;
+//   initCode: BytesLike;
+//   callData: BytesLike;
+//   callGasLimit: BigNumberish;
+//   verificationGasLimit: BigNumberish;
+//   preVerificationGas: BigNumberish;
+//   maxFeePerGas: BigNumberish;
+//   maxPriorityFeePerGas: BigNumberish;
+//   paymasterAndData: BytesLike;
+//   signature: BytesLike;
+// };
 
 export type UserOperationStructOutput = [
   string,
@@ -93,7 +94,7 @@ export declare namespace IStakeManager {
 
 export declare namespace IEntryPoint {
   export type UserOpsPerAggregatorStruct = {
-    userOps: UserOperationStruct[];
+    userOps: CustomUserOperationStruct[];
     aggregator: string;
     signature: BytesLike;
   };
@@ -254,7 +255,7 @@ export interface EntryPointInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getUserOpHash",
-    values: [UserOperationStruct]
+    values: [CustomUserOperationStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "handleAggregatedOps",
@@ -262,7 +263,7 @@ export interface EntryPointInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "handleOps",
-    values: [UserOperationStruct[], string]
+    values: [CustomUserOperationStruct[], string]
   ): string;
   encodeFunctionData(
     functionFragment: "incrementNonce",
@@ -283,14 +284,14 @@ export interface EntryPointInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "simulateHandleOp",
     values: [
-      UserOperationStruct,
+      CustomUserOperationStruct,
       string,
       BytesLike
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "simulateValidation",
-    values: [UserOperationStruct]
+    values: [CustomUserOperationStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "unlockStake",
@@ -403,7 +404,7 @@ export type AccountDeployedEvent = TypedEvent<
 
 export type AccountDeployedEventFilter = TypedEventFilter<AccountDeployedEvent>;
 
-export interface BeforeExecutionEventObject {}
+export interface BeforeExecutionEventObject { }
 export type BeforeExecutionEvent = TypedEvent<[], BeforeExecutionEventObject>;
 
 export type BeforeExecutionEventFilter = TypedEventFilter<BeforeExecutionEvent>;
@@ -593,7 +594,7 @@ export interface EntryPoint extends BaseContract {
     ): Promise<ContractTransaction>;
 
     getUserOpHash(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -604,7 +605,7 @@ export interface EntryPoint extends BaseContract {
     ): Promise<ContractTransaction>;
 
     handleOps(
-      ops: UserOperationStruct[],
+      ops: CustomUserOperationStruct[],
       beneficiary: string,
       overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
@@ -628,14 +629,14 @@ export interface EntryPoint extends BaseContract {
     ): Promise<[BigNumber]>;
 
     simulateHandleOp(
-      op: UserOperationStruct,
+      op: CustomUserOperationStruct,
       target: string,
       targetCallData: BytesLike,
       overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
     simulateValidation(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
@@ -709,7 +710,7 @@ export interface EntryPoint extends BaseContract {
   ): Promise<ContractTransaction>;
 
   getUserOpHash(
-    userOp: UserOperationStruct,
+    userOp: CustomUserOperationStruct,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -720,7 +721,7 @@ export interface EntryPoint extends BaseContract {
   ): Promise<ContractTransaction>;
 
   handleOps(
-    ops: UserOperationStruct[],
+    ops: CustomUserOperationStruct[],
     beneficiary: string,
     overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
@@ -744,14 +745,14 @@ export interface EntryPoint extends BaseContract {
   ): Promise<BigNumber>;
 
   simulateHandleOp(
-    op: UserOperationStruct,
+    op: CustomUserOperationStruct,
     target: string,
     targetCallData: BytesLike,
     overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
   simulateValidation(
-    userOp: UserOperationStruct,
+    userOp: CustomUserOperationStruct,
     overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
@@ -825,7 +826,7 @@ export interface EntryPoint extends BaseContract {
     ): Promise<void>;
 
     getUserOpHash(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -836,7 +837,7 @@ export interface EntryPoint extends BaseContract {
     ): Promise<void>;
 
     handleOps(
-      ops: UserOperationStruct[],
+      ops: CustomUserOperationStruct[],
       beneficiary: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -860,14 +861,14 @@ export interface EntryPoint extends BaseContract {
     ): Promise<BigNumber>;
 
     simulateHandleOp(
-      op: UserOperationStruct,
+      op: CustomUserOperationStruct,
       target: string,
       targetCallData: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
     simulateValidation(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1040,7 +1041,7 @@ export interface EntryPoint extends BaseContract {
     ): Promise<BigNumber>;
 
     getUserOpHash(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1051,7 +1052,7 @@ export interface EntryPoint extends BaseContract {
     ): Promise<BigNumber>;
 
     handleOps(
-      ops: UserOperationStruct[],
+      ops: CustomUserOperationStruct[],
       beneficiary: string,
       overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
@@ -1075,14 +1076,14 @@ export interface EntryPoint extends BaseContract {
     ): Promise<BigNumber>;
 
     simulateHandleOp(
-      op: UserOperationStruct,
+      op: CustomUserOperationStruct,
       target: string,
       targetCallData: BytesLike,
       overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
     simulateValidation(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
@@ -1151,7 +1152,7 @@ export interface EntryPoint extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getUserOpHash(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1162,7 +1163,7 @@ export interface EntryPoint extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     handleOps(
-      ops: UserOperationStruct[],
+      ops: CustomUserOperationStruct[],
       beneficiary: string,
       overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
@@ -1186,14 +1187,14 @@ export interface EntryPoint extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     simulateHandleOp(
-      op: UserOperationStruct,
+      op: CustomUserOperationStruct,
       target: string,
       targetCallData: BytesLike,
       overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
     simulateValidation(
-      userOp: UserOperationStruct,
+      userOp: CustomUserOperationStruct,
       overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 

@@ -2,12 +2,12 @@ import { BigNumberish } from "ethers";
 import { IDbController } from "types/lib";
 import RpcError from "types/lib/api/errors/rpc-error";
 import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
-import { UserOperationStruct } from "types/lib/executor/contracts/EntryPoint";
 import { getAddr, now } from "../utils";
 import { MempoolEntry } from "../entities/MempoolEntry";
 import { IMempoolEntry, MempoolEntrySerialized } from "../entities/interfaces";
 import { ReputationService } from "./ReputationService";
 import { StakeInfo } from "./UserOpValidation";
+import { CustomUserOperationStruct } from "types/src/executor/common";
 
 export class MempoolService {
   private MAX_MEMPOOL_USEROPS_PER_SENDER = 4;
@@ -31,7 +31,7 @@ export class MempoolService {
   }
 
   async addUserOp(
-    userOp: UserOperationStruct,
+    userOp: CustomUserOperationStruct,
     entryPoint: string,
     prefund: BigNumberish,
     senderInfo: StakeInfo,
@@ -85,7 +85,7 @@ export class MempoolService {
     await this.db.put(this.USEROP_COLLECTION_KEY, newKeys);
   }
 
-  async removeUserOp(userOp: UserOperationStruct): Promise<void> {
+  async removeUserOp(userOp: CustomUserOperationStruct): Promise<void> {
     const entry = new MempoolEntry({
       chainId: this.chainId,
       userOp,
@@ -113,7 +113,7 @@ export class MempoolService {
    * @returns true if new or replacing
    */
   async isNewOrReplacing(
-    userOp: UserOperationStruct,
+    userOp: CustomUserOperationStruct,
     entryPoint: string
   ): Promise<boolean> {
     const entry = new MempoolEntry({
@@ -156,7 +156,7 @@ export class MempoolService {
   }
 
   private async checkSenderCountInMempool(
-    userOp: UserOperationStruct,
+    userOp: CustomUserOperationStruct,
     userInfo: StakeInfo
   ): Promise<string | null> {
     const entries = await this.fetchAll();
@@ -170,7 +170,7 @@ export class MempoolService {
   }
 
   private async updateSeenStatus(
-    userOp: UserOperationStruct,
+    userOp: CustomUserOperationStruct,
     aggregator?: string
   ): Promise<void> {
     const paymaster = getAddr(userOp.paymasterAndData);

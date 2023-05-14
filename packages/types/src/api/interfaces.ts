@@ -1,5 +1,5 @@
 import { BigNumberish, providers } from "ethers";
-import { UserOperationStruct } from "../executor/contracts/EntryPoint";
+import { CustomUserOperationStruct } from "../executor/common";
 
 export type EstimatedUserOperationGas = {
   preVerificationGas: BigNumberish;
@@ -9,7 +9,7 @@ export type EstimatedUserOperationGas = {
 };
 
 export type UserOperationByHashResponse = {
-  userOperation: UserOperationStruct;
+  userOperation: CustomUserOperationStruct;
   entryPoint: string;
   blockNumber: number;
   blockHash: string;
