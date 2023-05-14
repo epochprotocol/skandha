@@ -28,19 +28,19 @@ import type {
 } from "./common";
 import { CustomUserOperationStruct } from "../common";
 
-// export type UserOperationStruct = {
-//   sender: string;
-//   nonce: BigNumberish;
-//   initCode: BytesLike;
-//   callData: BytesLike;
-//   callGasLimit: BigNumberish;
-//   verificationGasLimit: BigNumberish;
-//   preVerificationGas: BigNumberish;
-//   maxFeePerGas: BigNumberish;
-//   maxPriorityFeePerGas: BigNumberish;
-//   paymasterAndData: BytesLike;
-//   signature: BytesLike;
-// };
+export type UserOperationStruct = {
+  sender: string;
+  nonce: BigNumberish;
+  initCode: BytesLike;
+  callData: BytesLike;
+  callGasLimit: BigNumberish;
+  verificationGasLimit: BigNumberish;
+  preVerificationGas: BigNumberish;
+  maxFeePerGas: BigNumberish;
+  maxPriorityFeePerGas: BigNumberish;
+  paymasterAndData: BytesLike;
+  signature: BytesLike;
+};
 
 export type UserOperationStructOutput = [
   string,
