@@ -87,11 +87,18 @@ export class Eth {
       preVerificationGas: 0,
       verificationGasLimit: 10e6,
     };
+    const preVerificationGas = this.calcPreVerificationGas(userOp);
+    userOpComplemented.preVerificationGas = preVerificationGas;
+
     const { returnInfo } =
-      await this.userOpValidationService.simulateValidation(
+      await this.userOpValidationService.validateForEstimation(
         userOpComplemented,
         entryPoint
       );
+
+    // eslint-disable-next-line prefer-const
+    let { preOpGas, validAfter, validUntil } = returnInfo;
+
     const callGasLimit = await this.provider
       .estimateGas({
         from: entryPoint,
@@ -104,17 +111,22 @@ export class Eth {
           err.message.match(/reason="(.*?)"/)?.at(1) ?? "execution reverted";
         throw new RpcError(message, RpcErrorCodes.EXECUTION_REVERTED);
       });
-    const preVerificationGas = this.calcPreVerificationGas(userOp);
-    const verificationGas = BigNumber.from(returnInfo.preOpGas).toNumber();
-    let deadline: any = undefined;
-    if (returnInfo.deadline) {
-      deadline = BigNumber.from(returnInfo.deadline);
+    // const preVerificationGas = this.calcPreVerificationGas(userOp);
+    const verificationGas = BigNumber.from(preOpGas).toNumber();
+    validAfter = BigNumber.from(validAfter);
+    validUntil = BigNumber.from(validUntil);
+    if (validUntil === BigNumber.from(0)) {
+      validUntil = undefined;
+    }
+    if (validAfter === BigNumber.from(0)) {
+      validAfter = undefined;
     }
     return {
       preVerificationGas,
       verificationGas,
+      validAfter,
+      validUntil,
       callGasLimit,
-      deadline: deadline,
     };
   }
 
@@ -293,14 +305,21 @@ export class Eth {
     } as any;
 
     const packed = arrayify(packUserOp(p, false));
+    const lengthInWord = (packed.length + 31) / 32;
     const callDataCost = packed
       .map((x) => (x === 0 ? ov.zeroByte : ov.nonZeroByte))
       .reduce((sum, x) => sum + x);
     const ret = Math.round(
       callDataCost +
+<<<<<<< HEAD
       ov.fixed / ov.bundleSize +
       ov.perUserOp +
       ov.perUserOpWord * packed.length
+=======
+        ov.fixed / ov.bundleSize +
+        ov.perUserOp +
+        ov.perUserOpWord * lengthInWord
+>>>>>>> ef5041c9958204c3e22a6598f28c2c3329cd1d4c
     );
     return ret;
   }

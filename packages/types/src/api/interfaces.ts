@@ -3,9 +3,10 @@ import { CustomUserOperationStruct } from "../executor/common";
 
 export type EstimatedUserOperationGas = {
   preVerificationGas: BigNumberish;
-  callGasLimit: BigNumberish;
   verificationGas: BigNumberish;
-  deadline?: BigNumberish;
+  callGasLimit: BigNumberish;
+  validAfter?: BigNumberish;
+  validUntil?: BigNumberish;
 };
 
 export type UserOperationByHashResponse = {
