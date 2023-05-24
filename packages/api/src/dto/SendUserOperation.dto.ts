@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsDefined,
   IsEthereumAddress,
   IsObject,
@@ -35,6 +36,17 @@ export class SendUserOperationStruct {
   signature!: BytesLike;
   @IsBigNumber()
   callGasLimit!: BigNumberish;
+  @Type(() => AdvancedUserOperationStruct)
+  advancedUserOperationStruct!: AdvancedUserOperationStruct;
+}
+
+export class AdvancedUserOperationStruct {
+  @IsBigNumber()
+  executionWindowStart?: BigNumberish;
+  @IsBigNumber()
+  executionWindowEnd?: BigNumberish;
+  @IsBoolean()
+  readyForExecution: boolean | undefined;
 }
 
 export class SendUserOperationGasArgs {

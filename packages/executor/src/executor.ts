@@ -12,6 +12,7 @@ import {
 } from "./services";
 import { Config } from "./config";
 import { Logger } from "./interfaces";
+import { AdvancedOperationMempoolService } from "./services/AdvancedOperationsMempoolService";
 
 export interface ExecutorOptions {
   network: NetworkName;
@@ -34,6 +35,8 @@ export class Executor {
 
   public bundlingService: BundlingService;
   public mempoolService: MempoolService;
+  public advancedOpMempoolService: AdvancedOperationMempoolService;
+
   public userOpValidationService: UserOpValidationService;
   public reputationService: ReputationService;
 
@@ -74,6 +77,11 @@ export class Executor {
       chainId,
       this.reputationService
     );
+    this.advancedOpMempoolService = new AdvancedOperationMempoolService(
+      this.db,
+      chainId,
+      this.reputationService
+    );
     this.bundlingService = new BundlingService(
       this.network,
       this.provider,
@@ -94,6 +102,7 @@ export class Executor {
       this.provider,
       this.userOpValidationService,
       this.mempoolService,
+      this.advancedOpMempoolService,
       this.networkConfig,
       this.logger
     );

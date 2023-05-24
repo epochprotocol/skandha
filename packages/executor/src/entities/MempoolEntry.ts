@@ -2,7 +2,6 @@ import { BigNumber, BigNumberish, ethers } from "ethers";
 import { hexValue } from "ethers/lib/utils";
 import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
 import RpcError from "types/lib/api/errors/rpc-error";
-import { UserOperationStruct } from "types/lib/executor/contracts/EntryPoint";
 import { IMempoolEntry, MempoolEntrySerialized } from "./interfaces";
 import { CustomUserOperationStruct } from "types/src/executor/common";
 
@@ -106,6 +105,7 @@ export class MempoolEntry implements IMempoolEntry {
       this.userOp.maxPriorityFeePerGas = BigNumber.from(
         this.userOp.maxPriorityFeePerGas
       );
+      //todo: add validation for advanced user operations
     } catch (err) {
       throw new RpcError("Invalid UserOp", RpcErrorCodes.INVALID_USEROP);
     }
@@ -126,6 +126,7 @@ export class MempoolEntry implements IMempoolEntry {
         maxPriorityFeePerGas: hexValue(this.userOp.maxPriorityFeePerGas),
         paymasterAndData: this.userOp.paymasterAndData,
         signature: this.userOp.signature,
+        advancedUserOperation: this.userOp.advancedUserOperation,
       },
       prefund: hexValue(this.prefund),
       aggregator: this.aggregator,

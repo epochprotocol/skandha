@@ -1,21 +1,11 @@
 import { BigNumberish, BytesLike } from "ethers";
+import { UserOperationStruct } from "./contracts/EntryPoint";
 
 export interface AdvancedUserOperation {
-    executionWindowStart: BigNumberish;
-    executionWindowEnd: BigNumberish;
-    readyForExecution: boolean | undefined;
+    executionWindowStart?: BigNumberish;
+    executionWindowEnd?: BigNumberish;
+    readyForExecution?: boolean | undefined;
 }
-export type CustomUserOperationStruct = {
-    sender: string;
-    nonce: BigNumberish;
-    initCode: BytesLike;
-    callData: BytesLike;
-    callGasLimit: BigNumberish;
-    verificationGasLimit: BigNumberish;
-    preVerificationGas: BigNumberish;
-    maxFeePerGas: BigNumberish;
-    maxPriorityFeePerGas: BigNumberish;
-    paymasterAndData: BytesLike;
-    signature: BytesLike;
+export interface CustomUserOperationStruct extends UserOperationStruct {
     advancedUserOperation?: AdvancedUserOperation | undefined;
 };

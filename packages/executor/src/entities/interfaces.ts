@@ -1,15 +1,21 @@
 import { BigNumberish, BytesLike } from "ethers";
-import { UserOperationStruct } from "types/lib/executor/contracts/EntryPoint";
+import { AdvancedUserOperation, CustomUserOperationStruct } from "types/src/executor/common";
 
 export interface IMempoolEntry {
   chainId: number;
-  userOp: UserOperationStruct;
+  userOp: CustomUserOperationStruct;
   entryPoint: string;
   prefund: BigNumberish;
   aggregator?: string;
   hash?: string;
 }
-
+export interface IAdvancedOpMempoolEntry {
+  chainId: number;
+  userOp: CustomUserOperationStruct;
+  entryPoint: string;
+  aggregator?: string;
+  hash?: string;
+}
 export interface MempoolEntrySerialized {
   chainId: number;
   userOp: {
@@ -24,8 +30,9 @@ export interface MempoolEntrySerialized {
     maxPriorityFeePerGas: string;
     paymasterAndData: BytesLike;
     signature: BytesLike;
+    advancedUserOperation?: AdvancedUserOperation;
   };
-  prefund: string;
+  prefund?: string;
   aggregator: string | undefined;
   hash: string | undefined;
 }

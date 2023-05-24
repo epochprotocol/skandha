@@ -22,12 +22,14 @@ import {
   SendUserOperationGasArgs,
 } from "./interfaces";
 import { CustomUserOperationStruct } from "types/src/executor/common";
+import { AdvancedOperationMempoolService } from "../services/AdvancedOperationsMempoolService";
 
 export class Eth {
   constructor(
     private provider: ethers.providers.JsonRpcProvider,
     private userOpValidationService: UserOpValidationService,
     private mempoolService: MempoolService,
+    private advancedMempoolService: AdvancedOperationMempoolService,
     private config: NetworkConfig,
     private logger: Logger
   ) { }
@@ -44,23 +46,36 @@ export class Eth {
       throw new RpcError("Invalid Entrypoint", RpcErrorCodes.INVALID_REQUEST);
     }
     this.logger.debug("Validating user op before sending to mempool...");
+
     const validationResult =
       await this.userOpValidationService.simulateValidation(userOp, entryPoint);
-    // TODO: fetch aggregator
     this.logger.debug("Validation successful. Saving in mempool...");
-    await this.mempoolService.addUserOp(
-      userOp,
-      entryPoint,
-      validationResult.returnInfo.prefund,
-      validationResult.senderInfo,
-      validationResult.referencedContracts?.hash
-    );
+    if (userOp.advancedUserOperation !== undefined) {
+      await this.advancedMempoolService.addAdvancedUserOp(
+        userOp,
+        entryPoint,
+      );
+    } else {
+      await this.mempoolService.addUserOp(
+        userOp,
+        entryPoint,
+        validationResult.returnInfo.prefund,
+        validationResult.senderInfo,
+        validationResult.referencedContracts?.hash
+      );
+
+    }
     this.logger.debug("Saved in mempool");
     const entryPointContract = EntryPoint__factory.connect(
       entryPoint,
       this.provider
     );
-    return entryPointContract.getUserOpHash(userOp);
+    const opHash = await entryPointContract.getUserOpHash(userOp);
+    console.log("OpHash: " + opHash);
+    return opHash;
+    // TODO: fetch aggregator
+
+
   }
 
   /**
