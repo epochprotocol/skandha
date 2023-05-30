@@ -1,19 +1,17 @@
 import { ethers } from "ethers";
-
-export class BlockListner {
+type OnBlockCallback = (block: ethers.providers.Block) => void;
+export class BlockListener {
     wssProvider: ethers.providers.WebSocketProvider;
 
-    constructor() {
-        this.wssProvider = new ethers.providers.WebSocketProvider(
-            `wss://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`
-        );
+    constructor(provider: ethers.providers.WebSocketProvider) {
+        this.wssProvider = provider;
     }
 
-    listen = () => {
-        this.wssProvider.on("block", this.onBlock.bind(this));
+    listen = (onBlockCallBack: OnBlockCallback) => {
+        this.wssProvider.on("block", this.onBlock.bind({ blockNumber: this, onBlockCallBack: onBlockCallBack }));
     }
-    onBlock = async (blockNumber: number) => {
-        const block = await this.wssProvider.getBlock(blockNumber);
+    onBlock = async (blockNumber: number, onBlockCallBack: OnBlockCallback) => {
+        const block: ethers.providers.Block = await this.wssProvider.getBlock(blockNumber);
 
         console.log(block.number.toString());
     }
