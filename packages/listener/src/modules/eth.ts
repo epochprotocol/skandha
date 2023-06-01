@@ -3,7 +3,6 @@ import { BlockListener } from "../services/BlockListener";
 import { Config } from "../config";
 import { ethers } from "ethers";
 import { Logger } from "../interfaces";
-import { AdvancedUserOperation, CustomUserOperationStruct } from "types/src/executor/common";
 import { Executor } from "executor/lib/executor";
 import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
 import { ComparisionConditions, Conditions, IDbController } from "types/lib";
