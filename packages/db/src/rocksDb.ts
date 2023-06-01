@@ -2,6 +2,8 @@ import path from "node:path";
 import rocks from "rocksdb";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { IDbController } from "types/lib";
+import { findVal } from "./utils";
+import { Conditions } from "types/src/db/IDbController";
 
 enum Status {
   started = "started",
@@ -81,6 +83,32 @@ export class RocksDbController implements IDbController {
     this.db.open((err) => {
       if (err) throw Error("Unable to start database " + err);
     });
+  }
+
+  async findConditional(conditions: Array<Conditions>): Promise<any[]> {
+    const searchResults: Array<any> = [];
+    const allEntries: Array<any> = []
+    const dbIterator = this.db.iterator()
+    while (!dbIterator.finished) {
+      dbIterator.next((error, result) => {
+        if (error !== undefined) {
+          allEntries.push(result);
+
+        }
+      })
+    }
+    for (let i = 0; i < conditions.length; i++) {
+      {
+        const _condition = conditions[i];
+        allEntries.forEach((entry) => {
+          const searchResult = findVal(entry, _condition.key, _condition.expectedValue, _condition.comparisionConditions);
+          if (searchResult === true) {
+            searchResults.push(entry);
+          }
+        })
+      }
+    }
+    return searchResults;
   }
 
   async stop(): Promise<void> {

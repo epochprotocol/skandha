@@ -6,4 +6,17 @@ export interface IDbController {
   getMany<T>(keys: string[]): Promise<T[]>;
   start(): Promise<void>;
   stop(): Promise<void>;
+  findConditional(conditions: Array<Conditions>): Promise<any[]>;
+}
+
+export enum ComparisionConditions {
+  GT,
+  LT,
+  EQ
+}
+
+export interface Conditions {
+  key: string;
+  expectedValue: any;
+  comparisionConditions: ComparisionConditions
 }

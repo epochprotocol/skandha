@@ -1,5 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { IDbController } from "types/lib";
+import { findVal } from "./utils";
+import { Conditions } from "types/src/db/IDbController";
 
 enum Status {
   started = "started",
@@ -56,6 +58,23 @@ export class LocalDbController implements IDbController {
     });
   }
 
+  async findConditional(conditions: Array<Conditions>): Promise<any[]> {
+    const searchResults: Array<any> = [];
+
+    for (let i = 0; i < conditions.length; i++) {
+      {
+        const _condition = conditions[i];
+        Object.values(this.db).forEach((entry) => {
+          const searchResult = findVal(entry, _condition.key, _condition.expectedValue, _condition.comparisionConditions);
+          if (searchResult === true) {
+            searchResults.push(entry);
+          }
+        })
+      }
+    }
+    return searchResults;
+  }
+
   async start(): Promise<void> {
     if (this.status === Status.started) return;
     this.status = Status.started;
@@ -65,4 +84,7 @@ export class LocalDbController implements IDbController {
     if (this.status === Status.stopped) return;
     this.status = Status.stopped;
   }
+
+
+
 }

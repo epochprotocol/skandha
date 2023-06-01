@@ -6,6 +6,7 @@ import { Logger } from "../interfaces";
 import { AdvancedUserOperation, CustomUserOperationStruct } from "types/src/executor/common";
 import { Executor } from "executor/lib/executor";
 import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
+import { ComparisionConditions, Conditions, IDbController } from "types/lib";
 
 
 export class Eth {
@@ -13,17 +14,35 @@ export class Eth {
     public blockListener: BlockListener;
     private logger: Logger;
     private executor: Executor;
-    constructor(config: Config, network: NetworkName, logger: Logger, executor: Executor) {
+    private db: IDbController
+    constructor(config: Config, network: NetworkName, logger: Logger, executor: Executor, db: IDbController) {
         this.logger = logger;
         this.executor = executor;
+        this.db = db;
         this.blockListener = new BlockListener(
             config.getWebsocketProvider(network)!
         );
         this.blockListener.listen(this.onBlockCallback);
     }
-    public onBlockCallback = (block: ethers.providers.Block) => {
-        console.log("Get something done here");
+    public onBlockCallback = async (block: ethers.providers.Block) => {
+        const timebasedContions: Array<Conditions> = [
+            {
+                key: "executionWindowStart",
+                expectedValue: block.timestamp,
+                comparisionConditions: ComparisionConditions.GT,
 
+            },
+            {
+                key: "executionWindowEnd",
+                expectedValue: block.timestamp,
+                comparisionConditions: ComparisionConditions.LT,
+
+            }
+        ]
+
+        // for time based transactions
+        const advancedMempoolEntry: Array<AdvancedOpMempoolEntry> = await this.db.findConditional(timebasedContions);
+        advancedMempoolEntry.forEach(entry => this.advancedTransactionToMempool(entry));
     }
 
     private advancedTransactionToMempool = (advancedMempoolEntry: AdvancedOpMempoolEntry) => {

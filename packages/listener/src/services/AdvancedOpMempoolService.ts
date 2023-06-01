@@ -9,7 +9,6 @@ import { CustomUserOperationStruct } from "types/src/executor/common";
 import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
 
 export class AdvancedOperationMempoolService {
-    private MAX_MEMPOOL_USEROPS_PER_SENDER = 4;
     private ADVANCED_USEROP_COLLECTION_KEY: string;
 
     constructor(
@@ -122,7 +121,9 @@ export class AdvancedOperationMempoolService {
         }
         return null;
     }
-
+    private async findConditional(condition: any): Promise<AdvancedOpMempoolEntry | null> {
+        return null
+    }
     private getKey(entry: IAdvancedOpMempoolEntry): string {
         return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}`;
     }

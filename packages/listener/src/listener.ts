@@ -65,7 +65,7 @@ export class Listener {
             chainId,
         );
 
-        this.eth = new Eth(this.config, this.network, this.logger, this.executor);
+        this.eth = new Eth(this.config, this.network, this.logger, this.executor, this.db);
 
 
 
