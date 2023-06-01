@@ -2,6 +2,8 @@ import { NETWORK_NAME_TO_CHAIN_ID, NetworkName } from "types/lib";
 import { IDbController } from "types/lib";
 import { Executor } from "executor/lib/executor";
 import { Config } from "executor/lib/config";
+import { Config as ListenerConfig } from "listener/lib/config";
+
 import RpcError from "types/lib/api/errors/rpc-error";
 import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
 import { FastifyInstance, RouteHandler } from "fastify";
@@ -13,6 +15,7 @@ import {
 } from "./constants";
 import { EthAPI, DebugAPI, Web3API, RedirectAPI } from "./modules";
 import { deepHexlify } from "./utils";
+import { Listener } from "listener/lib/listener";
 
 export interface RpcHandlerOptions {
   network: NetworkName;
@@ -23,6 +26,7 @@ export interface RpcHandlerOptions {
 export interface EtherspotBundlerOptions {
   server: FastifyInstance;
   config: Config;
+  listenerConfig: ListenerConfig;
   db: IDbController;
   testingMode: boolean;
   redirectRpc: boolean;
@@ -38,6 +42,7 @@ export interface RelayerAPI {
 export class ApiApp {
   private server: FastifyInstance;
   private config: Config;
+  private listenerConfig: ListenerConfig;
   private db: IDbController;
   private relayers: RelayerAPI[] = [];
 
@@ -47,6 +52,8 @@ export class ApiApp {
   constructor(options: EtherspotBundlerOptions) {
     this.server = options.server;
     this.config = options.config;
+    this.listenerConfig = options.listenerConfig;
+
     this.db = options.db;
     this.testingMode = options.testingMode;
     this.redirectRpc = options.redirectRpc;
@@ -72,12 +79,20 @@ export class ApiApp {
   }
 
   private setupRouteFor(network: NetworkName): RouteHandler {
+    new Listener({
+      network,
+      db: this.db,
+      config: this.listenerConfig,
+      logger: logger
+    });
     const relayer = new Executor({
       network,
       db: this.db,
       config: this.config,
       logger: logger,
     });
+
+
     const ethApi = new EthAPI(relayer.eth);
     const debugApi = new DebugAPI(relayer.debug);
     const web3Api = new Web3API(relayer.web3);

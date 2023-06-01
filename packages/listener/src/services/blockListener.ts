@@ -8,12 +8,16 @@ export class BlockListener {
     }
 
     listen = (onBlockCallBack: OnBlockCallback) => {
-        this.wssProvider.on("block", this.onBlock.bind({ blockNumber: this, onBlockCallBack: onBlockCallBack }));
+        console.log("onBlockCallBack", onBlockCallBack);
+        this.wssProvider.on("block", (blockNumber: number) => {
+            this.onBlock(blockNumber, onBlockCallBack)
+        });
     }
     onBlock = async (blockNumber: number, onBlockCallBack: OnBlockCallback) => {
-        const block: ethers.providers.Block = await this.wssProvider.getBlock(blockNumber);
 
-        console.log(block.number.toString());
+        const block: ethers.providers.Block = await this.wssProvider.getBlock(blockNumber);
+        console.log("block number: ", block.number.toString());
+        onBlockCallBack(block);
     }
 
 }

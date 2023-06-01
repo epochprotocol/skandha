@@ -3,10 +3,8 @@ import { NetworkName } from "types/lib";
 import { BigNumberish, Wallet, providers, utils } from "ethers";
 
 export interface NetworkConfig {
-
     rpcEndpoint: string;
-    webSocketEndpoint: string;
-
+    websocketEndpoint: string;
 }
 
 
@@ -44,7 +42,7 @@ export class Config {
         const conf = this.networks[network];
         let endpoint = WEBSOCKET_ENDPOINT_ENV(network);
         if (!endpoint) {
-            endpoint = conf?.rpcEndpoint;
+            endpoint = conf?.websocketEndpoint;
         }
         return endpoint ? new providers.WebSocketProvider(endpoint) : null;
     }

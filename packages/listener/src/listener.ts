@@ -6,9 +6,9 @@ import { NetworkConfig } from "./config";
 
 import { Config } from "./config";
 import { Logger } from "./interfaces";
-import { AdvancedOperationMempoolService } from "./src/services/AdvancedOpMempoolService";
-import { MempoolService } from "./src/services/MempoolService";
-import { Eth } from "./src/modules/eth";
+import { AdvancedOperationMempoolService } from "./services/AdvancedOpMempoolService";
+import { MempoolService } from "./services/MempoolService";
+import { Eth } from "./modules/eth";
 
 export interface ListenerOptions {
     network: NetworkName;
@@ -34,10 +34,13 @@ export class Listener {
     networkConfig: NetworkConfig;
 
     constructor(options: ListenerOptions) {
+
         this.db = options.db;
         this.network = options.network;
         this.config = options.config;
         this.logger = options.logger;
+        console.log("In creating listener");
+        this.logger.info('Creating listener');
 
         this.networkConfig = options.config.networks[
             options.network
@@ -58,7 +61,8 @@ export class Listener {
             chainId,
         );
 
-        this.eth = new Eth(this.config, this.network);
+        this.eth = new Eth(this.config, this.network, this.logger);
+
 
 
     }

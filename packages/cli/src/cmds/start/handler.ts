@@ -3,6 +3,7 @@ import path, { resolve } from "node:path";
 import { Server } from "api/lib/server";
 import { ApiApp } from "api/lib/app";
 import { Config } from "executor/lib/config";
+import { Config as ListenerConfig, ConfigOptions as ListenerConfigOption } from "listener/lib/config"
 import {
   Namespace,
   getNamespaceByValue,
@@ -37,6 +38,23 @@ export async function bundlerHandler(
       unsafeMode,
     });
   }
+  let listenerConfig: ListenerConfig;
+  try {
+    const configPath = path.resolve(dataDir, networksFile);
+    const configOptions = readFile(configPath) as ListenerConfigOption;
+    listenerConfig = new ListenerConfig({
+      networks: configOptions.networks,
+      testingMode,
+      unsafeMode,
+    });
+  } catch (err) {
+    console.log("Config file not found. Proceeding with env vars...");
+    listenerConfig = new ListenerConfig({
+      networks: {},
+      testingMode,
+      unsafeMode,
+    });
+  }
 
   let db: IDbController;
 
@@ -63,6 +81,7 @@ export async function bundlerHandler(
   new ApiApp({
     server: server.application,
     config: config,
+    listenerConfig,
     db,
     testingMode,
     redirectRpc,

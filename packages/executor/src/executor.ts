@@ -106,5 +106,7 @@ export class Executor {
       this.networkConfig,
       this.logger
     );
+    this.logger.info('Creating executor');
+
   }
 }
