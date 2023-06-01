@@ -7,6 +7,7 @@ import { NetworkConfig } from "./config";
 import { Config } from "./config";
 import { Logger } from "./interfaces";
 import { AdvancedOperationMempoolService } from "./services/AdvancedOpMempoolService";
+import { Executor } from "executor/lib/executor";
 import { MempoolService } from "./services/MempoolService";
 import { Eth } from "./modules/eth";
 
@@ -15,6 +16,7 @@ export interface ListenerOptions {
     db: IDbController;
     config: Config;
     logger: Logger;
+    executor: Executor;
 }
 
 export class Listener {
@@ -32,6 +34,7 @@ export class Listener {
     private db: IDbController;
     logger: Logger;
     networkConfig: NetworkConfig;
+    executor: Executor;
 
     constructor(options: ListenerOptions) {
 
@@ -39,6 +42,7 @@ export class Listener {
         this.network = options.network;
         this.config = options.config;
         this.logger = options.logger;
+        this.executor = options.executor;
         console.log("In creating listener");
         this.logger.info('Creating listener');
 
@@ -61,7 +65,7 @@ export class Listener {
             chainId,
         );
 
-        this.eth = new Eth(this.config, this.network, this.logger);
+        this.eth = new Eth(this.config, this.network, this.logger, this.executor);
 
 
 

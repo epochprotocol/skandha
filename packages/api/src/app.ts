@@ -79,12 +79,7 @@ export class ApiApp {
   }
 
   private setupRouteFor(network: NetworkName): RouteHandler {
-    new Listener({
-      network,
-      db: this.db,
-      config: this.listenerConfig,
-      logger: logger
-    });
+
     const relayer = new Executor({
       network,
       db: this.db,
@@ -92,7 +87,13 @@ export class ApiApp {
       logger: logger,
     });
 
-
+    new Listener({
+      network,
+      db: this.db,
+      config: this.listenerConfig,
+      logger: logger,
+      executor: relayer,
+    });
     const ethApi = new EthAPI(relayer.eth);
     const debugApi = new DebugAPI(relayer.debug);
     const web3Api = new Web3API(relayer.web3);
