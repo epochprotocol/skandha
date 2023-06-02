@@ -58,18 +58,20 @@ export class LocalDbController implements IDbController {
     });
   }
 
-  async findConditional(conditions: Array<Conditions>): Promise<any[]> {
+  async findConditional(conditions: Array<Conditions>, keys: Array<string>): Promise<any[]> {
     const searchResults: Array<any> = [];
     console.log("DB Entry: ", this.db)
     for (let i = 0; i < conditions.length; i++) {
       {
+        console.log("DB keys:", keys);
         const _condition = conditions[i];
-        Object.values(this.db).forEach((entry) => {
+        keys.forEach((entryKey) => {
+          const entry = this.db[`${this.namespace}:${entryKey}`];
           console.log("DB Entry data:", entry)
           const searchResult = findVal(entry, _condition.key, _condition.expectedValue, _condition.comparisionConditions);
           if (searchResult === true) {
             let _entry = entry;
-            if (typeof entry === "string") {
+            if (typeof entry === 'string') {
               _entry = JSON.parse(entry);
             }
             searchResults.push(_entry);

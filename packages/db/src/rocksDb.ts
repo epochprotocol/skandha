@@ -85,18 +85,11 @@ export class RocksDbController implements IDbController {
     });
   }
 
-  async findConditional(conditions: Array<Conditions>): Promise<any[]> {
+  async findConditional(conditions: Array<Conditions>, keys: Array<string>): Promise<any[]> {
+    console.log("inside conditional");
     const searchResults: Array<any> = [];
-    const allEntries: Array<any> = []
-    const dbIterator = this.db.iterator()
-    while (!dbIterator.finished) {
-      dbIterator.next((error, result) => {
-        if (error !== undefined) {
-          allEntries.push(result);
+    const allEntries: Array<any> = await this.getMany(keys);
 
-        }
-      })
-    }
     console.log("RocksDB Entry: ", allEntries)
 
     for (let i = 0; i < conditions.length; i++) {

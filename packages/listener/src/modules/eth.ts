@@ -1,10 +1,11 @@
-import { NetworkName } from "types/lib/networks";
+import { NETWORK_NAME_TO_CHAIN_ID, NetworkName } from "types/lib/networks";
 import { BlockListener } from "../services/BlockListener";
 import { Config } from "../config";
 import { ethers } from "ethers";
 import { Logger } from "../interfaces";
 import { Executor } from "executor/lib/executor";
 import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
+import { AdvancedOperationMempoolService } from "../services/AdvancedOpMempoolService";
 import { ComparisionConditions, Conditions, IDbController } from "types/lib";
 
 
@@ -13,6 +14,7 @@ export class Eth {
     public blockListener: BlockListener;
     private logger: Logger;
     private executor: Executor;
+    private advancedMempoolService: AdvancedOperationMempoolService;
     private db: IDbController
     constructor(config: Config, network: NetworkName, logger: Logger, executor: Executor, db: IDbController) {
         this.logger = logger;
@@ -20,6 +22,12 @@ export class Eth {
         this.db = db;
         this.blockListener = new BlockListener(
             config.getWebsocketProvider(network)!
+        );
+        const chainId = Number(NETWORK_NAME_TO_CHAIN_ID[network]);
+
+        this.advancedMempoolService = new AdvancedOperationMempoolService(
+            this.db,
+            chainId,
         );
         this.blockListener.listen(this.onBlockCallback);
     }
@@ -40,7 +48,7 @@ export class Eth {
         ]
 
         // for time based transactions
-        const advancedMempoolEntry: Array<AdvancedOpMempoolEntry> = await this.db.findConditional(timebasedContions);
+        const advancedMempoolEntry: Array<AdvancedOpMempoolEntry> = await this.advancedMempoolService.fetchAllConditional(timebasedContions);
         console.log("advancedMempoolEntry", advancedMempoolEntry)
         advancedMempoolEntry.forEach(entry => this.advancedTransactionToMempool(entry));
     }

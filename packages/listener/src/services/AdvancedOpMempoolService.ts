@@ -7,6 +7,7 @@ import { MempoolEntry } from "../entities/MempoolEntry";
 import { IAdvancedOpMempoolEntry, IMempoolEntry, MempoolEntrySerialized } from "../entities/interfaces";
 import { CustomUserOperationStruct } from "types/src/executor/common";
 import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
+import { Conditions } from "types/src";
 
 export class AdvancedOperationMempoolService {
     private ADVANCED_USEROP_COLLECTION_KEY: string;
@@ -82,9 +83,9 @@ export class AdvancedOperationMempoolService {
         await this.remove(entry);
     }
 
-    async getSortedOps(): Promise<MempoolEntry[]> {
+    async getSortedOps(): Promise<AdvancedOpMempoolEntry[]> {
         const allEntries = await this.fetchAll();
-        return allEntries.sort(MempoolEntry.compareByCost);
+        return allEntries.sort(AdvancedOpMempoolEntry.compareByCost);
     }
 
     async clearState(): Promise<void> {
@@ -114,16 +115,14 @@ export class AdvancedOperationMempoolService {
 
     private async find(entry: AdvancedOpMempoolEntry): Promise<AdvancedOpMempoolEntry | null> {
         const raw = await this.db
-            .get<IMempoolEntry>(this.getKey(entry))
+            .get<AdvancedOpMempoolEntry>(this.getKey(entry))
             .catch(() => null);
         if (raw) {
             return this.rawEntryToMempoolEntry(raw);
         }
         return null;
     }
-    private async findConditional(condition: any): Promise<AdvancedOpMempoolEntry | null> {
-        return null
-    }
+
     private getKey(entry: IAdvancedOpMempoolEntry): string {
         return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}`;
     }
@@ -135,7 +134,7 @@ export class AdvancedOperationMempoolService {
         return advancedUserOpKeys;
     }
 
-    private async fetchAll(): Promise<MempoolEntry[]> {
+    private async fetchAll(): Promise<AdvancedOpMempoolEntry[]> {
         const keys = await this.fetchKeys();
         const rawEntries = await this.db
             .getMany<MempoolEntry>(keys)
@@ -144,13 +143,23 @@ export class AdvancedOperationMempoolService {
     }
 
 
+    public async fetchAllConditional(conditions: Array<Conditions>): Promise<AdvancedOpMempoolEntry[]> {
+        const keys = await this.fetchKeys();
+        const rawEntries = await this.db.findConditional(conditions, keys)
+            .catch(() => []);
+        return rawEntries.map(this.rawEntryToMempoolEntry);
+    }
 
-    private rawEntryToMempoolEntry(raw: IMempoolEntry): MempoolEntry {
-        return new MempoolEntry({
+
+
+    private rawEntryToMempoolEntry(raw: AdvancedOpMempoolEntry): AdvancedOpMempoolEntry {
+        console.log("RAW Entry:", raw);
+        console.log(typeof raw)
+        console.log("RAW USEROP", typeof raw.userOp, raw.userOp);
+        return new AdvancedOpMempoolEntry({
             chainId: raw.chainId,
             userOp: raw.userOp,
             entryPoint: raw.entryPoint,
-            prefund: raw.prefund,
             aggregator: raw.aggregator,
             hash: raw.hash,
         });

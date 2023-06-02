@@ -6,7 +6,7 @@ export interface IDbController {
   getMany<T>(keys: string[]): Promise<T[]>;
   start(): Promise<void>;
   stop(): Promise<void>;
-  findConditional(conditions: Array<Conditions>): Promise<any[]>;
+  findConditional(conditions: Array<Conditions>, keys: Array<string>): Promise<any[]>;
 }
 
 export enum ComparisionConditions {
