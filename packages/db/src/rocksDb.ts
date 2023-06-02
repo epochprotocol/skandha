@@ -97,6 +97,8 @@ export class RocksDbController implements IDbController {
         }
       })
     }
+    console.log("RocksDB Entry: ", allEntries)
+
     for (let i = 0; i < conditions.length; i++) {
       {
         const _condition = conditions[i];

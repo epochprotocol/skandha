@@ -41,6 +41,7 @@ export class Eth {
 
         // for time based transactions
         const advancedMempoolEntry: Array<AdvancedOpMempoolEntry> = await this.db.findConditional(timebasedContions);
+        console.log("advancedMempoolEntry", advancedMempoolEntry)
         advancedMempoolEntry.forEach(entry => this.advancedTransactionToMempool(entry));
     }
 
