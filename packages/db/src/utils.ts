@@ -12,9 +12,7 @@ export const findVal = (objectStr: any, key: any, expectedValue: any, comparisio
   Object.keys(object).some((k): any => {
 
     if (k === key) {
-      console.log("data key:", key, ":", object[k]);
       searchResult = comparisions(object[k], expectedValue, comparisionCondition);
-      console.log("Search result1: ", searchResult);
       return searchResult;
     }
     if (object[k] && typeof object[k] === 'object') {
@@ -26,7 +24,6 @@ export const findVal = (objectStr: any, key: any, expectedValue: any, comparisio
     }
 
   });
-  console.log("Search result:", searchResult)
   return searchResult;
 }
 

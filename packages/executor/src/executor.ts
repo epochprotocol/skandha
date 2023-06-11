@@ -80,7 +80,6 @@ export class Executor {
     this.advancedOpMempoolService = new AdvancedOperationMempoolService(
       this.db,
       chainId,
-      this.reputationService
     );
     this.bundlingService = new BundlingService(
       this.network,

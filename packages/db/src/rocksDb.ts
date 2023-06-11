@@ -86,7 +86,6 @@ export class RocksDbController implements IDbController {
   }
 
   async findConditional(conditions: Array<Conditions>, keys: Array<string>): Promise<any[]> {
-    console.log("inside conditional");
     const searchResults: Array<any> = [];
     const allEntries: Array<any> = await this.getMany(keys);
 

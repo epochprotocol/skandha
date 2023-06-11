@@ -50,13 +50,17 @@ export class Eth {
         // for time based transactions
         const advancedMempoolEntry: Array<AdvancedOpMempoolEntry> = await this.advancedMempoolService.fetchAllConditional(timebasedContions);
         console.log("advancedMempoolEntry", advancedMempoolEntry)
-        advancedMempoolEntry.forEach(entry => this.advancedTransactionToMempool(entry));
+        if (advancedMempoolEntry.length > 0) {
+            this.advancedTransactionToMempool(advancedMempoolEntry[0])
+        }
+        // advancedMempoolEntry.forEach(entry => this.advancedTransactionToMempool(entry));
     }
 
     private advancedTransactionToMempool = (advancedMempoolEntry: AdvancedOpMempoolEntry) => {
-        const userOp = advancedMempoolEntry.userOp;
+        let userOp = advancedMempoolEntry.userOp;
         userOp.advancedUserOperation = undefined;
         const entryPoint = advancedMempoolEntry.entryPoint;
+        console.log('UserOperation:', userOp)
         this.executor.eth.sendUserOperation({ entryPoint, userOp: userOp })
     }
 

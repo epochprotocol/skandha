@@ -40,22 +40,25 @@ export class Eth {
    * @param entryPoint the entrypoint address the request should be sent through. this MUST be one of the entry points returned by the supportedEntryPoints rpc call.
    */
   async sendUserOperation(args: SendUserOperationGasArgs): Promise<string> {
-    const userOp = args.userOp as unknown as CustomUserOperationStruct;
+    let userOp = args.userOp as unknown as CustomUserOperationStruct;
     const entryPoint = args.entryPoint;
     if (!this.validateEntryPoint(entryPoint)) {
       throw new RpcError("Invalid Entrypoint", RpcErrorCodes.INVALID_REQUEST);
     }
     this.logger.debug("Validating user op before sending to mempool...");
 
-    const validationResult =
-      await this.userOpValidationService.simulateValidation(userOp, entryPoint);
+
     this.logger.debug("Validation successful. Saving in mempool...");
-    if (userOp.advancedUserOperation !== undefined) {
+    console.log("userOp.advancedUserOperation: ", userOp.advancedUserOperation);
+    if (userOp.advancedUserOperation) {
       await this.advancedMempoolService.addAdvancedUserOp(
         userOp,
         entryPoint,
       );
     } else {
+      console.log("userOp.advancedUserOperation:ADSFADSF ", userOp);
+      const validationResult =
+        await this.userOpValidationService.simulateValidation(userOp, entryPoint);
       await this.mempoolService.addUserOp(
         userOp,
         entryPoint,

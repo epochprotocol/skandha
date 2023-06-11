@@ -119,6 +119,13 @@ export class UserOpValidationService {
       entryPoint,
       this.provider
     );
+
+    const nonce = await entryPointContract.getNonce("0x4CEc9CF609f8AE37f85eeAb9B3299905e4Dc8ba0", ethers.BigNumber.from(0))
+    console.log("nonce: ", nonce);
+
+    const nonce2 = await entryPointContract.getNonce("0xb28884540Dc4FA18568Bbc8564386eBd342e3a04", ethers.BigNumber.from(0))
+    console.log("nonce2: ", nonce2);
+
     const tx = {
       to: entryPoint,
       data: entryPointContract.interface.encodeFunctionData(
@@ -138,6 +145,7 @@ export class UserOpValidationService {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const errorResult = entryPointContract.interface.parseError(lastCall.data!);
+    console.log("errorResult", errorResult);
     const validationResult = this.parseErrorResult(userOp, {
       errorName: errorResult.name,
       errorArgs: errorResult.args,
@@ -352,7 +360,7 @@ export class UserOpValidationService {
       // eslint-disable-next-line
       const msg: string =
         errorResult.errorArgs?.reason ?? errorResult.toString();
-
+      console.log("paymaster", paymaster)
       if (paymaster == null) {
         throw new RpcError(msg, RpcErrorCodes.VALIDATION_FAILED);
       } else {
@@ -378,9 +386,9 @@ export class UserOpValidationService {
       return addr == null
         ? null
         : {
-            ...info,
-            addr,
-          };
+          ...info,
+          addr,
+        };
     }
 
     return {

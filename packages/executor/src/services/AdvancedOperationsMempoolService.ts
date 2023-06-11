@@ -5,19 +5,16 @@ import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
 import { getAddr, now } from "../utils";
 import { MempoolEntry } from "../entities/MempoolEntry";
 import { IAdvancedOpMempoolEntry, IMempoolEntry, MempoolEntrySerialized } from "../entities/interfaces";
-import { ReputationService } from "./ReputationService";
-import { StakeInfo } from "./UserOpValidation";
 import { CustomUserOperationStruct } from "types/src/executor/common";
 import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
+import { Conditions } from "types/src";
 
 export class AdvancedOperationMempoolService {
-    private MAX_MEMPOOL_USEROPS_PER_SENDER = 4;
     private ADVANCED_USEROP_COLLECTION_KEY: string;
 
     constructor(
         private db: IDbController,
         private chainId: number,
-        private reputationService: ReputationService
     ) {
         this.ADVANCED_USEROP_COLLECTION_KEY = `${chainId}:ADVANCEDUSEROPKEYS`;
     }
@@ -47,12 +44,12 @@ export class AdvancedOperationMempoolService {
         });
         const existingEntry = await this.find(entry);
         if (existingEntry) {
-            if (!entry.canReplace(existingEntry)) {
-                throw new RpcError(
-                    "User op cannot be replaced: fee too low",
-                    RpcErrorCodes.INVALID_USEROP
-                );
-            }
+            // if (!entry.canReplace(existingEntry)) {
+            //     throw new RpcError(
+            //         "User op cannot be replaced: fee too low",
+            //         RpcErrorCodes.INVALID_USEROP
+            //     );
+            // }
             await this.db.put(this.getKey(entry), {
                 ...entry,
                 lastUpdatedTime: now(),
@@ -64,7 +61,6 @@ export class AdvancedOperationMempoolService {
             await this.db.put(this.ADVANCED_USEROP_COLLECTION_KEY, advancedUserOpKeys);
             await this.db.put(key, { ...entry, lastUpdatedTime: now() });
         }
-        await this.updateSeenStatus(userOp, aggregator);
     }
 
     async remove(entry: MempoolEntry | null): Promise<void> {
@@ -87,9 +83,9 @@ export class AdvancedOperationMempoolService {
         await this.remove(entry);
     }
 
-    async getSortedOps(): Promise<MempoolEntry[]> {
+    async getSortedOps(): Promise<AdvancedOpMempoolEntry[]> {
         const allEntries = await this.fetchAll();
-        return allEntries.sort(MempoolEntry.compareByCost);
+        return allEntries.sort(AdvancedOpMempoolEntry.compareByCost);
     }
 
     async clearState(): Promise<void> {
@@ -119,9 +115,10 @@ export class AdvancedOperationMempoolService {
 
     private async find(entry: AdvancedOpMempoolEntry): Promise<AdvancedOpMempoolEntry | null> {
         const raw = await this.db
-            .get<IMempoolEntry>(this.getKey(entry))
+            .get<AdvancedOpMempoolEntry>(this.getKey(entry))
             .catch(() => null);
         if (raw) {
+            console.log(raw);
             return this.rawEntryToMempoolEntry(raw);
         }
         return null;
@@ -138,7 +135,7 @@ export class AdvancedOperationMempoolService {
         return advancedUserOpKeys;
     }
 
-    private async fetchAll(): Promise<MempoolEntry[]> {
+    private async fetchAll(): Promise<AdvancedOpMempoolEntry[]> {
         const keys = await this.fetchKeys();
         const rawEntries = await this.db
             .getMany<MempoolEntry>(keys)
@@ -146,43 +143,24 @@ export class AdvancedOperationMempoolService {
         return rawEntries.map(this.rawEntryToMempoolEntry);
     }
 
-    private async checkSenderCountInMempool(
-        userOp: CustomUserOperationStruct,
-        userInfo: StakeInfo
-    ): Promise<string | null> {
-        const entries = await this.fetchAll();
-        const count: number = entries.filter(
-            ({ userOp: { sender } }) => sender === userOp.sender
-        ).length;
-        if (count >= this.MAX_MEMPOOL_USEROPS_PER_SENDER) {
-            return this.reputationService.checkStake(userInfo);
-        }
-        return null;
+
+    public async fetchAllConditional(conditions: Array<Conditions>): Promise<AdvancedOpMempoolEntry[]> {
+        const keys = await this.fetchKeys();
+        const rawEntries = await this.db.findConditional(conditions, keys)
+            .catch(() => []);
+        return rawEntries.map(this.rawEntryToMempoolEntry);
     }
 
-    private async updateSeenStatus(
-        userOp: CustomUserOperationStruct,
-        aggregator?: string
-    ): Promise<void> {
-        const paymaster = getAddr(userOp.paymasterAndData);
-        const sender = getAddr(userOp.initCode);
-        if (aggregator) {
-            await this.reputationService.updateSeenStatus(aggregator);
-        }
-        if (paymaster) {
-            await this.reputationService.updateSeenStatus(paymaster);
-        }
-        if (sender) {
-            await this.reputationService.updateSeenStatus(sender);
-        }
-    }
 
-    private rawEntryToMempoolEntry(raw: IMempoolEntry): MempoolEntry {
-        return new MempoolEntry({
+
+    private rawEntryToMempoolEntry(raw: AdvancedOpMempoolEntry): AdvancedOpMempoolEntry {
+        console.log("RAW Entry:", raw);
+        console.log(typeof raw)
+        console.log("RAW USEROP", typeof raw.userOp, raw.userOp);
+        return new AdvancedOpMempoolEntry({
             chainId: raw.chainId,
             userOp: raw.userOp,
             entryPoint: raw.entryPoint,
-            prefund: raw.prefund,
             aggregator: raw.aggregator,
             hash: raw.hash,
         });

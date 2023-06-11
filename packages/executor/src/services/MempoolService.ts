@@ -48,12 +48,12 @@ export class MempoolService {
     });
     const existingEntry = await this.find(entry);
     if (existingEntry) {
-      if (!entry.canReplace(existingEntry)) {
-        throw new RpcError(
-          "User op cannot be replaced: fee too low",
-          RpcErrorCodes.INVALID_USEROP
-        );
-      }
+      // if (!entry.canReplace(existingEntry)) {
+      //   throw new RpcError(
+      //     "User op cannot be replaced: fee too low",
+      //     RpcErrorCodes.INVALID_USEROP
+      //   );
+      // }
       await this.db.put(this.getKey(entry), {
         ...entry,
         lastUpdatedTime: now(),
