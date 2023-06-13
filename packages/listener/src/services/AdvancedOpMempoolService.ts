@@ -1,8 +1,5 @@
-import { BigNumberish } from "ethers";
 import { IDbController } from "types/lib";
-import RpcError from "types/lib/api/errors/rpc-error";
-import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
-import { getAddr, now } from "../utils";
+import { now } from "../utils";
 import { MempoolEntry } from "../entities/MempoolEntry";
 import { IAdvancedOpMempoolEntry, IMempoolEntry, MempoolEntrySerialized } from "../entities/interfaces";
 import { CustomUserOperationStruct } from "types/src/executor/common";
@@ -63,7 +60,7 @@ export class AdvancedOperationMempoolService {
         }
     }
 
-    async remove(entry: MempoolEntry | null): Promise<void> {
+    async remove(entry: AdvancedOpMempoolEntry | null): Promise<void> {
         if (!entry) {
             return;
         }
