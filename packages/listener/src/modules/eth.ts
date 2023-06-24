@@ -1,5 +1,4 @@
 import { NETWORK_NAME_TO_CHAIN_ID, NetworkName } from "types/lib/networks";
-import { BlockListener } from "../services/BlockListener";
 import { Config } from "../config";
 import { ethers } from "ethers";
 import { Logger } from "../interfaces";
@@ -7,6 +6,7 @@ import { Executor } from "executor/lib/executor";
 import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
 import { AdvancedOperationMempoolService } from "../services/AdvancedOpMempoolService";
 import { ComparisionConditions, Conditions, IDbController } from "types/lib";
+import { BlockListener } from "../services/blockListener";
 
 
 export class Eth {
@@ -31,7 +31,7 @@ export class Eth {
         );
         this.blockListener.listen(this.onBlockCallback);
     }
-    public onBlockCallback = async (block: ethers.providers.Block) => {
+    public onBlockCallback = async (block: ethers.providers.Block, events: ethers.providers.Log[]) => {
         const timebasedContions: Array<Conditions> = [
             {
                 key: "executionWindowStart",
@@ -43,7 +43,6 @@ export class Eth {
                 key: "executionWindowEnd",
                 expectedValue: block.timestamp,
                 comparisionConditions: ComparisionConditions.LT,
-
             }
         ]
 
@@ -51,11 +50,19 @@ export class Eth {
         const advancedMempoolEntry: Array<AdvancedOpMempoolEntry> = await this.advancedMempoolService.fetchAllConditional(timebasedContions);
         this.logger.info("advancedMempoolEntry", advancedMempoolEntry)
 
-        for (let index = 0; index < advancedMempoolEntry.length; index++) {
-            const element = advancedMempoolEntry[index];
+        // for event based transactions
+        // const advancedMempoolEntryMatchedEvent: Array<AdvancedOpMempoolEntry> = await this.advancedMempoolService.fetchAllEventConditionals(events);
+        // this.logger.info("advancedMempoolEntryMatchedEvent: ", advancedMempoolEntryMatchedEvent);
+
+        await Promise.all(advancedMempoolEntry.map(async (element) => {
             await this.advancedMempoolService.remove(element);
             this.advancedTransactionToMempool(element)
-        }
+        }))
+
+        // await Promise.all(advancedMempoolEntryMatchedEvent.map(async (element) => {
+        //     await this.advancedMempoolService.remove(element);
+        //     this.advancedTransactionToMempool(element)
+        // }))
     }
 
     private advancedTransactionToMempool = (advancedMempoolEntry: AdvancedOpMempoolEntry) => {

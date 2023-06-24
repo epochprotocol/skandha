@@ -32,7 +32,7 @@
     },
     "dependencies": {
         "ethers": "5.7.2",
-        "types": "*",
-        "params": "*"
+        "params": "*",
+        "types": "*"
     }
 }

@@ -5,6 +5,7 @@ import { IAdvancedOpMempoolEntry, IMempoolEntry, MempoolEntrySerialized } from "
 import { CustomUserOperationStruct } from "types/src/executor/common";
 import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
 import { Conditions } from "types/src";
+import { ethers } from "ethers";
 
 export class AdvancedOperationMempoolService {
     private ADVANCED_USEROP_COLLECTION_KEY: string;
@@ -47,6 +48,7 @@ export class AdvancedOperationMempoolService {
             //         RpcErrorCodes.INVALID_USEROP
             //     );
             // }
+            await this.remove(existingEntry);
             await this.db.put(this.getKey(entry), {
                 ...entry,
                 lastUpdatedTime: now(),
@@ -148,7 +150,36 @@ export class AdvancedOperationMempoolService {
         return rawEntries.map(this.rawEntryToMempoolEntry);
     }
 
+    public async fetchAllEventConditionals(events: ethers.providers.Log[]): Promise<AdvancedOpMempoolEntry[]> {
+        const keys = await this.fetchKeys();
 
+        let eventsAndKeys: any = []
+
+        const filteredKeys = keys.filter((key: string) => {
+            if(key.split(':').length === 4) {
+                const logContractAndSignature = key.split(':')[3]
+                const isEventinBlock = events.find(event => {
+                    console.log("event: ", event.topics[0]);
+                    return event.address + event.topics[0] === logContractAndSignature
+                })
+                if(isEventinBlock){
+                    eventsAndKeys.push({
+                        key,
+                        event: isEventinBlock
+                    })
+                    return true
+                }
+            }
+            return false
+        })
+
+        console.log("filetereedKeys", filteredKeys)
+        console.log("eventsAndKeys", eventsAndKeys)
+
+        const rawEntries = await this.db.findConditional([], filteredKeys)
+            .catch(() => []);
+        return rawEntries.map(this.rawEntryToMempoolEntry);
+    }
 
     private rawEntryToMempoolEntry(raw: AdvancedOpMempoolEntry): AdvancedOpMempoolEntry {
         console.log("RAW Entry:", raw);
