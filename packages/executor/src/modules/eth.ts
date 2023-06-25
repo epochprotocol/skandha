@@ -23,6 +23,8 @@ import {
 } from "./interfaces";
 import { CustomUserOperationStruct } from "types/src/executor/common";
 import { AdvancedOperationMempoolService } from "../services/AdvancedOperationsMempoolService";
+import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
+import { ComparisionConditions, Conditions } from "types/lib";
 
 export class Eth {
   constructor(
@@ -267,6 +269,30 @@ export class Eth {
       logs,
       receipt,
     });
+  }
+
+  /**
+   *
+   * @param sender senders address
+   * @returns a UserOperation array
+   */
+  async getUserOperations(
+    sender: string
+  ): Promise<Array<AdvancedOpMempoolEntry | null>> {
+    const timebasedContions: Array<Conditions> = [
+      {
+          key: "sender",
+          expectedValue: sender,
+          comparisionConditions: ComparisionConditions.EQ,
+      }
+    ]
+
+    // for time based transactions
+    const advancedMempoolEntry: Array<AdvancedOpMempoolEntry> = await this.advancedMempoolService.fetchAllConditional(timebasedContions);
+    // const userUserOps = advancedMempoolEntry.filter((entry: AdvancedOpMempoolEntry) => entry.userOp.sender === sender)
+    // this.logger.info("userUserOps", userUserOps)
+
+    return advancedMempoolEntry
   }
 
   /**

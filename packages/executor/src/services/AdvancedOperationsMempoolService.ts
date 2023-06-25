@@ -125,7 +125,11 @@ export class AdvancedOperationMempoolService {
     }
 
     private getKey(entry: IAdvancedOpMempoolEntry): string {
-        return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}`;
+        if(entry.userOp.advancedUserOperation?.triggerEvent) {
+            return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}:${entry.userOp.advancedUserOperation.triggerEvent.contractAddress + entry.userOp.advancedUserOperation.triggerEvent.eventSignature}`;
+        } else {
+            return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}`;
+        }
     }
 
     private async fetchKeys(): Promise<string[]> {
@@ -135,7 +139,7 @@ export class AdvancedOperationMempoolService {
         return advancedUserOpKeys;
     }
 
-    private async fetchAll(): Promise<AdvancedOpMempoolEntry[]> {
+    public async fetchAll(): Promise<AdvancedOpMempoolEntry[]> {
         const keys = await this.fetchKeys();
         const rawEntries = await this.db
             .getMany<MempoolEntry>(keys)

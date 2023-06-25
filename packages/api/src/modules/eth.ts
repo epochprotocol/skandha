@@ -1,4 +1,4 @@
-import { Eth } from "executor/lib/modules/eth";
+import { Eth } from "../../../executor/lib/modules/eth";
 import {
   EstimatedUserOperationGas,
   UserOperationByHashResponse,
@@ -7,6 +7,7 @@ import {
 import { RpcMethodValidator } from "../utils/RpcMethodValidator";
 import { SendUserOperationGasArgs } from "../dto/SendUserOperation.dto";
 import { EstimateUserOperationGasArgs } from "../dto/EstimateUserOperation.dto";
+import { AdvancedOpMempoolEntry } from "listener/src/entities/AdvancedOpMempoolEntry";
 
 export class EthAPI {
   constructor(private ethModule: Eth) {}
@@ -59,6 +60,17 @@ export class EthAPI {
     hash: string
   ): Promise<UserOperationByHashResponse | null> {
     return await this.ethModule.getUserOperationByHash(hash);
+  }
+
+  /**
+   *
+   * @param sender senders address
+   * @returns array of user operations that might get executed in future
+   */
+  async getUserOperations(
+    sender: string
+  ): Promise<Array<AdvancedOpMempoolEntry | null>> {
+    return await this.ethModule.getUserOperations(sender);
   }
 
   /**

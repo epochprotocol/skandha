@@ -185,6 +185,9 @@ export class ApiApp {
           case BundlerRPCMethods.eth_getUserOperationByHash:
             result = await ethApi.getUserOperationByHash(params[0]);
             break;
+          case BundlerRPCMethods.eth_getUserOperations:
+            result = await ethApi.getUserOperations(params[0]);
+            break;
           case BundlerRPCMethods.web3_clientVersion:
             result = web3Api.clientVersion();
             break;
