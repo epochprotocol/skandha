@@ -6,6 +6,7 @@ import { CustomUserOperationStruct } from "types/src/executor/common";
 import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
 import { Conditions } from "types/src";
 import { ethers } from "ethers";
+import _ from "lodash";
 
 export class AdvancedOperationMempoolService {
     private ADVANCED_USEROP_COLLECTION_KEY: string;
@@ -41,6 +42,7 @@ export class AdvancedOperationMempoolService {
             hash,
         });
         const existingEntry = await this.find(entry);
+        console.log("existingEntry: ", existingEntry);
         if (existingEntry) {
             // if (!entry.canReplace(existingEntry)) {
             //     throw new RpcError(
@@ -48,11 +50,16 @@ export class AdvancedOperationMempoolService {
             //         RpcErrorCodes.INVALID_USEROP
             //     );
             // }
-            await this.remove(existingEntry);
-            await this.db.put(this.getKey(entry), {
-                ...entry,
-                lastUpdatedTime: now(),
-            });
+            console.log("asdfasdfsadfsdfdsdsfqeqw",(_.isEqual(userOp.advancedUserOperation, existingEntry.userOp.advancedUserOperation)))
+            if(!(_.isEqual(userOp.advancedUserOperation, existingEntry.userOp.advancedUserOperation))){
+                console.log("hrereununsdf")
+                await this.remove(existingEntry);
+            }
+            const advancedUserOpKeys = await this.fetchKeys();
+            const key = this.getKey(entry);
+            advancedUserOpKeys.push(key);
+            await this.db.put(this.ADVANCED_USEROP_COLLECTION_KEY, advancedUserOpKeys);
+            await this.db.put(key, { ...entry, lastUpdatedTime: now() });
         } else {
             const advancedUserOpKeys = await this.fetchKeys();
             const key = this.getKey(entry);
