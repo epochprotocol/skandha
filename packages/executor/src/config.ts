@@ -58,6 +58,7 @@ export class Config {
 
     // fetch from env variables first
     let privKey = RELAYER_ENV(network);
+    console.log("privKey: ", privKey);
     if (!privKey) {
       privKey = config.relayer;
     }
@@ -67,9 +68,9 @@ export class Config {
       throw new Error("no provider");
     }
 
-    if (this.testingMode) {
-      return provider.getSigner();
-    }
+    // if (this.testingMode) {
+    //   return provider.getSigner();
+    // }
 
     if (privKey.startsWith("0x")) {
       return new Wallet(privKey, provider);

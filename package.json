@@ -9,6 +9,7 @@
     "clean": "rm -rf ./packages/*/lib ./packages/*/*.tsbuildinfo",
     "bootstrap": "lerna bootstrap & lerna link",
     "build": "yarn workspace types run build && yarn workspace db run build & lerna run build",
+    "dev": "nodemon --watch 'packages/**/*' --exec \"yarn build && yarn bootstrap && ./skandha --testingMode\"",
     "lint": "eslint --color --ext .ts packages/*/src/",
     "fix-lint": "eslint --ext .ts --fix packages/*/src/",
     "test:unit": "lerna run test:unit --no-bail --concurrency 1",
@@ -18,7 +19,7 @@
   },
   "devDependencies": {
     "@types/compression": "1.7.2",
-    "@types/jest": "29.2.3",
+    "@types/jest": "29.2.3",  
     "@types/node": "18.11.9",
     "@typescript-eslint/eslint-plugin": "5.43.0",
     "@typescript-eslint/parser": "5.43.0",
@@ -37,5 +38,8 @@
   "license": "MIT",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "nodemon": "^2.0.22"
+  }
 }

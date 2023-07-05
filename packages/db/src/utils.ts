@@ -28,6 +28,7 @@ export const findVal = (objectStr: any, key: any, expectedValue: any, comparisio
 }
 
 export const comparisions = (value: any, expectedValue: any, comparisionCondition: ComparisionConditions): boolean => {
+  console.log("comparisionCondition: ", comparisionCondition);
   if (typeof expectedValue !== 'number') {
     if (value === expectedValue) {
       return true;

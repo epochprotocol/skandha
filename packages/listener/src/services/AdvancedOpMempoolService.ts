@@ -52,19 +52,22 @@ export class AdvancedOperationMempoolService {
             // }
             console.log("asdfasdfsadfsdfdsdsfqeqw",(_.isEqual(userOp.advancedUserOperation, existingEntry.userOp.advancedUserOperation)))
             if(!(_.isEqual(userOp.advancedUserOperation, existingEntry.userOp.advancedUserOperation))){
-                console.log("hrereununsdf")
                 await this.remove(existingEntry);
             }
             const advancedUserOpKeys = await this.fetchKeys();
+            console.log("advancedUserOpKeys1: ", advancedUserOpKeys);
             const key = this.getKey(entry);
-            advancedUserOpKeys.push(key);
-            await this.db.put(this.ADVANCED_USEROP_COLLECTION_KEY, advancedUserOpKeys);
+            const newAdvancedUserOpKeys = [...advancedUserOpKeys, key]
+            console.log("advancedUserOpKeys12: ", newAdvancedUserOpKeys);
+            await this.db.put(this.ADVANCED_USEROP_COLLECTION_KEY, newAdvancedUserOpKeys);
             await this.db.put(key, { ...entry, lastUpdatedTime: now() });
         } else {
             const advancedUserOpKeys = await this.fetchKeys();
+            console.log("advancedUserOpKeys2: ", advancedUserOpKeys);
             const key = this.getKey(entry);
-            advancedUserOpKeys.push(key);
-            await this.db.put(this.ADVANCED_USEROP_COLLECTION_KEY, advancedUserOpKeys);
+            const newAdvancedUserOpKeys = [...advancedUserOpKeys, key]
+            console.log("advancedUserOpKeys22: ", newAdvancedUserOpKeys);
+            await this.db.put(this.ADVANCED_USEROP_COLLECTION_KEY, newAdvancedUserOpKeys);
             await this.db.put(key, { ...entry, lastUpdatedTime: now() });
         }
     }
@@ -151,10 +154,25 @@ export class AdvancedOperationMempoolService {
 
 
     public async fetchAllConditional(conditions: Array<Conditions>): Promise<AdvancedOpMempoolEntry[]> {
+        console.log("conditions2: ", conditions);
         const keys = await this.fetchKeys();
+        console.log("keys2: ", keys);
         const rawEntries = await this.db.findConditional(conditions, keys)
             .catch(() => []);
         return rawEntries.map(this.rawEntryToMempoolEntry);
+    }
+
+    private rawEntryToMempoolEntry(raw: AdvancedOpMempoolEntry): AdvancedOpMempoolEntry {
+        console.log("RAW Entry:", raw);
+        console.log(typeof raw)
+        console.log("RAW USEROP", typeof raw.userOp, raw.userOp);
+        return new AdvancedOpMempoolEntry({
+            chainId: raw.chainId,
+            userOp: raw.userOp,
+            entryPoint: raw.entryPoint,
+            aggregator: raw.aggregator,
+            hash: raw.hash,
+        });
     }
 
     public async fetchAllEventConditionals(events: ethers.providers.Log[]): Promise<AdvancedOpMempoolEntry[]> {
@@ -186,18 +204,5 @@ export class AdvancedOperationMempoolService {
         const rawEntries = await this.db.findConditional([], filteredKeys)
             .catch(() => []);
         return rawEntries.map(this.rawEntryToMempoolEntry);
-    }
-
-    private rawEntryToMempoolEntry(raw: AdvancedOpMempoolEntry): AdvancedOpMempoolEntry {
-        console.log("RAW Entry:", raw);
-        console.log(typeof raw)
-        console.log("RAW USEROP", typeof raw.userOp, raw.userOp);
-        return new AdvancedOpMempoolEntry({
-            chainId: raw.chainId,
-            userOp: raw.userOp,
-            entryPoint: raw.entryPoint,
-            aggregator: raw.aggregator,
-            hash: raw.hash,
-        });
     }
 }

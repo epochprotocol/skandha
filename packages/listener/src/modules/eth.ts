@@ -32,6 +32,7 @@ export class Eth {
         this.blockListener.listen(this.onBlockCallback);
     }
     public onBlockCallback = async (block: ethers.providers.Block, events: ethers.providers.Log[]) => {
+        console.log("block.timestamp: ", block.timestamp);
         const timebasedContions: Array<Conditions> = [
             {
                 key: "executionWindowStart",
