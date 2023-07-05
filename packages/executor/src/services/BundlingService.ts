@@ -275,9 +275,16 @@ export class BundlingService {
    */
   private async selectBeneficiary(): Promise<string> {
     const config = this.config.getNetworkConfig(this.network);
+    console.log("config: ", config);
     let beneficiary = this.config.getBeneficiary(this.network);
+    console.log("beneficiary: ", beneficiary);
     const signer = this.config.getRelayer(this.network);
-    const signerAddress = await signer!.getAddress();
+    console.log("signer: ", signer);
+    if(!signer){
+      throw "Cannot find signer"
+    }
+    const signerAddress = await signer.getAddress();
+    console.log("signerAddress: ", signerAddress);
     const currentBalance = await this.provider.getBalance(signerAddress);
 
     if (currentBalance.lte(config!.minSignerBalance) || !beneficiary) {

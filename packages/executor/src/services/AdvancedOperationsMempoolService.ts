@@ -1,6 +1,4 @@
-import { BigNumberish } from "ethers";
 import { IDbController } from "types/lib";
-import RpcError from "types/lib/api/errors/rpc-error";
 import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
 import { getAddr, now } from "../utils";
 import { MempoolEntry } from "../entities/MempoolEntry";
@@ -57,15 +55,19 @@ export class AdvancedOperationMempoolService {
                 await this.remove(existingEntry);
             }
             const advancedUserOpKeys = await this.fetchKeys();
+            console.log("advancedUserOpKeys1: ", advancedUserOpKeys);
             const key = this.getKey(entry);
-            advancedUserOpKeys.push(key);
-            await this.db.put(this.ADVANCED_USEROP_COLLECTION_KEY, advancedUserOpKeys);
+            const newAdvancedUserOpKeys = [...advancedUserOpKeys, key]
+            console.log("advancedUserOpKeys12: ", newAdvancedUserOpKeys);
+            await this.db.put(this.ADVANCED_USEROP_COLLECTION_KEY, newAdvancedUserOpKeys);
             await this.db.put(key, { ...entry, lastUpdatedTime: now() });
         } else {
             const advancedUserOpKeys = await this.fetchKeys();
+            console.log("advancedUserOpKeys2: ", advancedUserOpKeys);
             const key = this.getKey(entry);
-            advancedUserOpKeys.push(key);
-            await this.db.put(this.ADVANCED_USEROP_COLLECTION_KEY, advancedUserOpKeys);
+            const newAdvancedUserOpKeys = [...advancedUserOpKeys, key]
+            console.log("advancedUserOpKeys22: ", newAdvancedUserOpKeys);
+            await this.db.put(this.ADVANCED_USEROP_COLLECTION_KEY, newAdvancedUserOpKeys);
             await this.db.put(key, { ...entry, lastUpdatedTime: now() });
         }
     }
@@ -133,11 +135,12 @@ export class AdvancedOperationMempoolService {
     }
 
     private getKey(entry: IAdvancedOpMempoolEntry): string {
-        if(entry.userOp.advancedUserOperation?.triggerEvent) {
-            return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}:${entry.userOp.advancedUserOperation.triggerEvent.contractAddress + entry.userOp.advancedUserOperation.triggerEvent.eventSignature}`;
-        } else {
-            return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}`;
-        }
+        return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}`;
+        // if(entry.userOp.advancedUserOperation?.triggerEvent) {
+        //     return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}:${entry.userOp.advancedUserOperation.triggerEvent.contractAddress + entry.userOp.advancedUserOperation.triggerEvent.eventSignature}`;
+        // } else {
+        //     return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}`;
+        // }
     }
 
     private async fetchKeys(): Promise<string[]> {
@@ -155,15 +158,14 @@ export class AdvancedOperationMempoolService {
         return rawEntries.map(this.rawEntryToMempoolEntry);
     }
 
-
     public async fetchAllConditional(conditions: Array<Conditions>): Promise<AdvancedOpMempoolEntry[]> {
+        console.log("conditions1: ", conditions);
         const keys = await this.fetchKeys();
+        console.log("keys1: ", keys);
         const rawEntries = await this.db.findConditional(conditions, keys)
             .catch(() => []);
         return rawEntries.map(this.rawEntryToMempoolEntry);
     }
-
-
 
     private rawEntryToMempoolEntry(raw: AdvancedOpMempoolEntry): AdvancedOpMempoolEntry {
         console.log("RAW Entry:", raw);

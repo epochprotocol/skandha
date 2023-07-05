@@ -94,6 +94,7 @@ export class RocksDbController implements IDbController {
     for (let i = 0; i < conditions.length; i++) {
       {
         const _condition = conditions[i];
+        console.log("_condition: ", _condition);
         allEntries.forEach((entry) => {
           const searchResult = findVal(entry, _condition.key, _condition.expectedValue, _condition.comparisionConditions);
           if (searchResult === true) {

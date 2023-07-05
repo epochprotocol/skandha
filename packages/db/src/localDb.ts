@@ -60,6 +60,7 @@ export class LocalDbController implements IDbController {
 
   async findConditional(conditions: Array<Conditions>, keys: Array<string>): Promise<any[]> {
     const searchResults: Array<any> = [];
+    const conditionsResults: Array<boolean> = []
     console.log("DB Entry: ", this.db)
     for (let i = 0; i < conditions.length; i++) {
       {
@@ -69,6 +70,8 @@ export class LocalDbController implements IDbController {
           const entry = this.db[`${this.namespace}:${entryKey}`];
           console.log("DB Entry data:", entry)
           const searchResult = findVal(entry, _condition.key, _condition.expectedValue, _condition.comparisionConditions);
+          console.log("searchResult: ", searchResult);
+          conditionsResults.push(searchResult)
           if (searchResult === true) {
             let _entry = entry;
             if (typeof entry === 'string') {
@@ -79,6 +82,12 @@ export class LocalDbController implements IDbController {
         })
       }
     }
+    console.log("conditionsResults: ", conditionsResults);
+    
+    if(conditionsResults.includes(false) || conditionsResults.length === 0){
+      return []
+    }
+
     return searchResults;
   }
 
