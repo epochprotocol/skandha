@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from "ethers";
 import { hexValue } from "ethers/lib/utils";
-import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
-import RpcError from "types/lib/api/errors/rpc-error";
+import * as RpcErrorCodes from "../api/errors/rpc-error-codes";
+import RpcError from "../api/errors/rpc-error";
 import { CustomUserOperationStruct } from "types/src/executor/common";
 import { AdvancedMempoolEntrySerialized, IAdvancedOpMempoolEntry } from "./interfaces/advancedMempoolInterfaces";
 

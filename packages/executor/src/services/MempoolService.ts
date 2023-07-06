@@ -8,7 +8,7 @@ import { IMempoolEntry, MempoolEntrySerialized } from "../entities/interfaces";
 import { ReputationService } from "./ReputationService";
 import { StakeInfo } from "./UserOpValidation";
 import { CustomUserOperationStruct } from "types/src/executor/common";
-import { now } from "types/common/utils/DateTime";
+import { now } from "common/lib/utils";
 
 export class MempoolService {
   private MAX_MEMPOOL_USEROPS_PER_SENDER = 4;

@@ -6,9 +6,9 @@ import { NetworkConfig } from "./config";
 
 import { Config } from "./config";
 import { Logger } from "./interfaces";
-import { Executor } from "executor/lib/executor";
 import { Eth } from "./modules/eth";
-import { AdvancedOperationMempoolService } from "types/common/services/AdvancedOperationsMempoolService";
+import { Executor } from "executor/lib/executor";
+import { AdvancedOperationMempoolService } from "common/lib/services";
 
 export interface ListenerOptions {
     network: NetworkName;

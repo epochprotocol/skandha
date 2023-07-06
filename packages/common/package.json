@@ -1,7 +1,7 @@
 {
-    "name": "listener",
+    "name": "common",
     "version": "0.0.1",
-    "description": "A Listner module for Epoch",
+    "description": "The types of Etherspot bundler client",
     "author": "Etherspot",
     "homepage": "https://https://github.com/etherspot/skandha#readme",
     "license": "MIT",
@@ -31,12 +31,8 @@
         "check-readme": "typescript-docs-verifier"
     },
     "dependencies": {
-        "@types/lodash": "^4.14.195",
+        "@chainsafe/ssz": "0.10.1",
         "ethers": "5.7.2",
-        "lodash": "^4.17.21",
-        "common": "*",
-        "params": "*",
-        "executor": "*",
         "types": "*"
     }
 }

@@ -5,8 +5,8 @@ import { Logger } from "../interfaces";
 import { Executor } from "executor/lib/executor";
 import { ComparisionConditions, Conditions, IDbController } from "types/lib";
 import { BlockListener } from "../services/blockListener";
-import { AdvancedOpMempoolEntry } from "types/common/AdvancedOpMempoolEntry";
-import { AdvancedOperationMempoolService } from "types/common/services/AdvancedOperationsMempoolService";
+import { AdvancedOpMempoolEntry } from "types/lib/common/AdvancedOpMempoolEntry";
+import { AdvancedOperationMempoolService } from "common/lib/services";
 
 
 export class Eth {

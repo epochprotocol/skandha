@@ -23,8 +23,8 @@ import {
 } from "./interfaces";
 import { CustomUserOperationStruct } from "types/src/executor/common";
 import { ComparisionConditions, Conditions } from "types/lib";
-import { AdvancedOpMempoolEntry } from "types/common/AdvancedOpMempoolEntry";
-import { AdvancedOperationMempoolService } from "types/common/services/AdvancedOperationsMempoolService";
+import { AdvancedOperationMempoolService } from "common/lib/services";
+import { AdvancedOpMempoolEntry } from "types/lib/common/AdvancedOpMempoolEntry";
 
 export class Eth {
   constructor(

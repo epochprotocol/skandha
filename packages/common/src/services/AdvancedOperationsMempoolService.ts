@@ -3,9 +3,9 @@ import { CustomUserOperationStruct } from "types/src/executor/common";
 import { Conditions } from "types/src";
 import { ethers } from "ethers";
 import _ from "lodash";
-import { AdvancedOpMempoolEntry } from "types/common/AdvancedOpMempoolEntry";
-import { AdvancedMempoolEntrySerialized, IAdvancedOpMempoolEntry } from "types/common/interfaces/advancedMempoolInterfaces";
 import { now } from "../utils/DateTime";
+import { AdvancedMempoolEntrySerialized, IAdvancedOpMempoolEntry } from "types/lib/common/interfaces/advancedMempoolInterfaces";
+import { AdvancedOpMempoolEntry } from "types/lib/common/AdvancedOpMempoolEntry";
 
 export class AdvancedOperationMempoolService {
     private ADVANCED_USEROP_COLLECTION_KEY: string;
