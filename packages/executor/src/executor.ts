@@ -12,7 +12,7 @@ import {
 } from "./services";
 import { Config } from "./config";
 import { Logger } from "./interfaces";
-import { AdvancedOperationMempoolService } from "./services/AdvancedOperationsMempoolService";
+import { AdvancedOperationMempoolService } from "types/common/services/AdvancedOperationsMempoolService";
 
 export interface ExecutorOptions {
   network: NetworkName;

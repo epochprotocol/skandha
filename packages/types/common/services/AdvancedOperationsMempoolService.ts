@@ -1,12 +1,11 @@
 import { IDbController } from "types/lib";
-import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
-import { getAddr, now } from "../utils";
-import { MempoolEntry } from "../entities/MempoolEntry";
-import { IAdvancedOpMempoolEntry, IMempoolEntry, MempoolEntrySerialized } from "../entities/interfaces";
 import { CustomUserOperationStruct } from "types/src/executor/common";
-import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
 import { Conditions } from "types/src";
+import { ethers } from "ethers";
 import _ from "lodash";
+import { AdvancedOpMempoolEntry } from "types/common/AdvancedOpMempoolEntry";
+import { AdvancedMempoolEntrySerialized, IAdvancedOpMempoolEntry } from "types/common/interfaces/advancedMempoolInterfaces";
+import { now } from "../utils/DateTime";
 
 export class AdvancedOperationMempoolService {
     private ADVANCED_USEROP_COLLECTION_KEY: string;
@@ -24,7 +23,7 @@ export class AdvancedOperationMempoolService {
         return advancedUserOpKeys.length;
     }
 
-    async dump(): Promise<MempoolEntrySerialized[]> {
+    async dump(): Promise<AdvancedMempoolEntrySerialized[]> {
         return (await this.fetchAll()).map((entry) => entry.serialize());
     }
 
@@ -42,7 +41,7 @@ export class AdvancedOperationMempoolService {
             hash,
         });
         const existingEntry = await this.find(entry);
-        console.log("existingEntryss: ", existingEntry);
+        console.log("existingEntry: ", existingEntry);
         if (existingEntry) {
             // if (!entry.canReplace(existingEntry)) {
             //     throw new RpcError(
@@ -50,8 +49,8 @@ export class AdvancedOperationMempoolService {
             //         RpcErrorCodes.INVALID_USEROP
             //     );
             // }
-            console.log("asdfasdfsadfsdfdsdsfqeqw",(_.isEqual(userOp.advancedUserOperation, existingEntry.userOp.advancedUserOperation)))
-            if(!(_.isEqual(userOp.advancedUserOperation, existingEntry.userOp.advancedUserOperation))){
+            console.log("asdfasdfsadfsdfdsdsfqeqw", (_.isEqual(userOp.advancedUserOperation, existingEntry.userOp.advancedUserOperation)))
+            if (!(_.isEqual(userOp.advancedUserOperation, existingEntry.userOp.advancedUserOperation))) {
                 await this.remove(existingEntry);
             }
             const advancedUserOpKeys = await this.fetchKeys();
@@ -73,7 +72,6 @@ export class AdvancedOperationMempoolService {
     }
 
     async remove(entry: AdvancedOpMempoolEntry | null): Promise<void> {
-        console.log("Removing entry");
         if (!entry) {
             return;
         }
@@ -84,11 +82,10 @@ export class AdvancedOperationMempoolService {
     }
 
     async removeUserOp(userOp: CustomUserOperationStruct): Promise<void> {
-        const entry = new MempoolEntry({
+        const entry = new AdvancedOpMempoolEntry({
             chainId: this.chainId,
             userOp,
             entryPoint: "",
-            prefund: 0,
         });
         await this.remove(entry);
     }
@@ -136,11 +133,6 @@ export class AdvancedOperationMempoolService {
 
     private getKey(entry: IAdvancedOpMempoolEntry): string {
         return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}`;
-        // if(entry.userOp.advancedUserOperation?.triggerEvent) {
-        //     return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}:${entry.userOp.advancedUserOperation.triggerEvent.contractAddress + entry.userOp.advancedUserOperation.triggerEvent.eventSignature}`;
-        // } else {
-        //     return `advancedOp${this.chainId}:${entry.userOp.sender}:${entry.userOp.nonce}`;
-        // }
     }
 
     private async fetchKeys(): Promise<string[]> {
@@ -150,18 +142,19 @@ export class AdvancedOperationMempoolService {
         return advancedUserOpKeys;
     }
 
-    public async fetchAll(): Promise<AdvancedOpMempoolEntry[]> {
+    private async fetchAll(): Promise<AdvancedOpMempoolEntry[]> {
         const keys = await this.fetchKeys();
         const rawEntries = await this.db
-            .getMany<MempoolEntry>(keys)
+            .getMany<AdvancedOpMempoolEntry>(keys)
             .catch(() => []);
         return rawEntries.map(this.rawEntryToMempoolEntry);
     }
 
+
     public async fetchAllConditional(conditions: Array<Conditions>): Promise<AdvancedOpMempoolEntry[]> {
-        console.log("conditions1: ", conditions);
+        console.log("conditions2: ", conditions);
         const keys = await this.fetchKeys();
-        console.log("keys1: ", keys);
+        console.log("keys2: ", keys);
         const rawEntries = await this.db.findConditional(conditions, keys)
             .catch(() => []);
         return rawEntries.map(this.rawEntryToMempoolEntry);
@@ -178,5 +171,36 @@ export class AdvancedOperationMempoolService {
             aggregator: raw.aggregator,
             hash: raw.hash,
         });
+    }
+
+    public async fetchAllEventConditionals(events: ethers.providers.Log[]): Promise<AdvancedOpMempoolEntry[]> {
+        const keys = await this.fetchKeys();
+
+        let eventsAndKeys: any = []
+
+        const filteredKeys = keys.filter((key: string) => {
+            if (key.split(':').length === 4) {
+                const logContractAndSignature = key.split(':')[3]
+                const isEventinBlock = events.find(event => {
+                    console.log("event: ", event.topics[0]);
+                    return event.address + event.topics[0] === logContractAndSignature
+                })
+                if (isEventinBlock) {
+                    eventsAndKeys.push({
+                        key,
+                        event: isEventinBlock
+                    })
+                    return true
+                }
+            }
+            return false
+        })
+
+        console.log("filetereedKeys", filteredKeys)
+        console.log("eventsAndKeys", eventsAndKeys)
+
+        const rawEntries = await this.db.findConditional([], filteredKeys)
+            .catch(() => []);
+        return rawEntries.map(this.rawEntryToMempoolEntry);
     }
 }

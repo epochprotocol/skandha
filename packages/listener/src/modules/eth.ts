@@ -3,10 +3,10 @@ import { Config } from "../config";
 import { ethers } from "ethers";
 import { Logger } from "../interfaces";
 import { Executor } from "executor/lib/executor";
-import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
-import { AdvancedOperationMempoolService } from "../services/AdvancedOpMempoolService";
 import { ComparisionConditions, Conditions, IDbController } from "types/lib";
 import { BlockListener } from "../services/blockListener";
+import { AdvancedOpMempoolEntry } from "types/common/AdvancedOpMempoolEntry";
+import { AdvancedOperationMempoolService } from "types/common/services/AdvancedOperationsMempoolService";
 
 
 export class Eth {

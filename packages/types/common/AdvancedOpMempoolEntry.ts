@@ -1,15 +1,14 @@
-import { BigNumber, BigNumberish, ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { hexValue } from "ethers/lib/utils";
 import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
 import RpcError from "types/lib/api/errors/rpc-error";
-import { IMempoolEntry, MempoolEntrySerialized } from "./interfaces";
 import { CustomUserOperationStruct } from "types/src/executor/common";
+import { AdvancedMempoolEntrySerialized, IAdvancedOpMempoolEntry } from "./interfaces/advancedMempoolInterfaces";
 
-export class MempoolEntry implements IMempoolEntry {
+export class AdvancedOpMempoolEntry implements IAdvancedOpMempoolEntry {
     chainId: number;
     userOp: CustomUserOperationStruct;
     entryPoint: string;
-    prefund: BigNumberish;
     aggregator?: string;
     lastUpdatedTime: number;
     hash?: string;
@@ -18,21 +17,18 @@ export class MempoolEntry implements IMempoolEntry {
         chainId,
         userOp,
         entryPoint,
-        prefund,
         aggregator,
         hash,
     }: {
         chainId: number;
         userOp: CustomUserOperationStruct;
         entryPoint: string;
-        prefund: BigNumberish;
         aggregator?: string | undefined;
         hash?: string | undefined;
     }) {
         this.chainId = chainId;
         this.userOp = userOp;
         this.entryPoint = entryPoint;
-        this.prefund = prefund;
         if (aggregator) {
             this.aggregator = aggregator;
         }
@@ -50,7 +46,7 @@ export class MempoolEntry implements IMempoolEntry {
      * @param entry MempoolEntry
      * @returns boolaen
      */
-    canReplace(existingEntry: MempoolEntry): boolean {
+    canReplace(existingEntry: AdvancedOpMempoolEntry): boolean {
         if (!this.isEqual(existingEntry)) return false;
         if (
             BigNumber.from(this.userOp.maxPriorityFeePerGas).lt(
@@ -71,16 +67,17 @@ export class MempoolEntry implements IMempoolEntry {
         return true;
     }
 
-    isEqual(entry: MempoolEntry): boolean {
+    isEqual(entry: AdvancedOpMempoolEntry): boolean {
         return (
             entry.chainId === this.chainId &&
             BigNumber.from(entry.userOp.nonce).eq(this.userOp.nonce) &&
-            entry.userOp.sender === this.userOp.sender
+            entry.userOp.sender === this.userOp.sender &&
+            (entry.userOp.advancedUserOperation != this.userOp.advancedUserOperation)
         );
     }
 
     // sorts by cost in descending order
-    static compareByCost(a: MempoolEntry, b: MempoolEntry): number {
+    static compareByCost(a: AdvancedOpMempoolEntry, b: AdvancedOpMempoolEntry): number {
         const {
             userOp: { maxPriorityFeePerGas: aFee },
         } = a;
@@ -92,7 +89,6 @@ export class MempoolEntry implements IMempoolEntry {
 
     validateAndTransformUserOp(): void {
         try {
-            this.prefund = BigNumber.from(this.prefund);
             this.userOp.nonce = BigNumber.from(this.userOp.nonce);
             this.userOp.callGasLimit = BigNumber.from(this.userOp.callGasLimit);
             this.userOp.verificationGasLimit = BigNumber.from(
@@ -111,7 +107,7 @@ export class MempoolEntry implements IMempoolEntry {
         }
     }
 
-    serialize(): MempoolEntrySerialized {
+    serialize(): AdvancedMempoolEntrySerialized {
         return {
             chainId: this.chainId,
             userOp: {
@@ -128,7 +124,6 @@ export class MempoolEntry implements IMempoolEntry {
                 signature: this.userOp.signature,
                 advancedUserOperation: this.userOp.advancedUserOperation,
             },
-            prefund: hexValue(this.prefund),
             aggregator: this.aggregator,
             hash: this.hash,
         };

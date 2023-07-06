@@ -2,12 +2,13 @@ import { BigNumberish } from "ethers";
 import { IDbController } from "types/lib";
 import RpcError from "types/lib/api/errors/rpc-error";
 import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
-import { getAddr, now } from "../utils";
+import { getAddr } from "../utils";
 import { MempoolEntry } from "../entities/MempoolEntry";
 import { IMempoolEntry, MempoolEntrySerialized } from "../entities/interfaces";
 import { ReputationService } from "./ReputationService";
 import { StakeInfo } from "./UserOpValidation";
 import { CustomUserOperationStruct } from "types/src/executor/common";
+import { now } from "types/common/utils/DateTime";
 
 export class MempoolService {
   private MAX_MEMPOOL_USEROPS_PER_SENDER = 4;

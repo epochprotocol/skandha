@@ -189,9 +189,6 @@ export function extractAddrFromInitCode(data?: BytesLike): string | undefined {
   return undefined;
 }
 
-export function now(): number {
-  return new Date().getTime();
-}
 
 export function getAddr(data?: BytesLike): string | undefined {
   if (data == null) {

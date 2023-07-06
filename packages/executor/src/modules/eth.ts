@@ -22,9 +22,9 @@ import {
   SendUserOperationGasArgs,
 } from "./interfaces";
 import { CustomUserOperationStruct } from "types/src/executor/common";
-import { AdvancedOperationMempoolService } from "../services/AdvancedOperationsMempoolService";
-import { AdvancedOpMempoolEntry } from "../entities/AdvancedOpMempoolEntry";
 import { ComparisionConditions, Conditions } from "types/lib";
+import { AdvancedOpMempoolEntry } from "types/common/AdvancedOpMempoolEntry";
+import { AdvancedOperationMempoolService } from "types/common/services/AdvancedOperationsMempoolService";
 
 export class Eth {
   constructor(
@@ -281,9 +281,9 @@ export class Eth {
   ): Promise<Array<AdvancedOpMempoolEntry | null>> {
     const timebasedContions: Array<Conditions> = [
       {
-          key: "sender",
-          expectedValue: sender,
-          comparisionConditions: ComparisionConditions.EQ,
+        key: "sender",
+        expectedValue: sender,
+        comparisionConditions: ComparisionConditions.EQ,
       }
     ]
 

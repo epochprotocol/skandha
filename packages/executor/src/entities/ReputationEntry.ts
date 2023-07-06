@@ -1,4 +1,4 @@
-import { now } from "../utils";
+import { now } from "types/common/utils/DateTime";
 import {
   IReputationEntry,
   ReputationEntrySerialized,

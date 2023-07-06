@@ -9,7 +9,7 @@ export interface IAdvancedOpMempoolEntry {
     aggregator?: string;
     hash?: string;
 }
-export interface MempoolEntrySerialized {
+export interface AdvancedMempoolEntrySerialized {
     chainId: number;
     userOp: {
         sender: string;

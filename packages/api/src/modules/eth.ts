@@ -7,10 +7,10 @@ import {
 import { RpcMethodValidator } from "../utils/RpcMethodValidator";
 import { SendUserOperationGasArgs } from "../dto/SendUserOperation.dto";
 import { EstimateUserOperationGasArgs } from "../dto/EstimateUserOperation.dto";
-import { AdvancedOpMempoolEntry } from "listener/src/entities/AdvancedOpMempoolEntry";
+import { AdvancedOpMempoolEntry } from "types/common/AdvancedOpMempoolEntry";
 
 export class EthAPI {
-  constructor(private ethModule: Eth) {}
+  constructor(private ethModule: Eth) { }
 
   /**
    *

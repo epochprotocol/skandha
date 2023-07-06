@@ -9,13 +9,13 @@ export interface IMempoolEntry {
   aggregator?: string;
   hash?: string;
 }
-export interface IAdvancedOpMempoolEntry {
-  chainId: number;
-  userOp: CustomUserOperationStruct;
-  entryPoint: string;
-  aggregator?: string;
-  hash?: string;
-}
+// export interface IAdvancedOpMempoolEntry {
+//   chainId: number;
+//   userOp: CustomUserOperationStruct;
+//   entryPoint: string;
+//   aggregator?: string;
+//   hash?: string;
+// }
 export interface MempoolEntrySerialized {
   chainId: number;
   userOp: {

@@ -6,10 +6,9 @@ import { NetworkConfig } from "./config";
 
 import { Config } from "./config";
 import { Logger } from "./interfaces";
-import { AdvancedOperationMempoolService } from "./services/AdvancedOpMempoolService";
 import { Executor } from "executor/lib/executor";
-import { MempoolService } from "./services/MempoolService";
 import { Eth } from "./modules/eth";
+import { AdvancedOperationMempoolService } from "types/common/services/AdvancedOperationsMempoolService";
 
 export interface ListenerOptions {
     network: NetworkName;
@@ -27,7 +26,6 @@ export class Listener {
     public provider: providers.JsonRpcProvider;
 
 
-    public mempoolService: MempoolService;
     public advancedOpMempoolService: AdvancedOperationMempoolService;
 
 
@@ -56,10 +54,6 @@ export class Listener {
 
         const chainId = Number(NETWORK_NAME_TO_CHAIN_ID[this.network]);
 
-        this.mempoolService = new MempoolService(
-            this.db,
-            chainId,
-        );
         this.advancedOpMempoolService = new AdvancedOperationMempoolService(
             this.db,
             chainId,
