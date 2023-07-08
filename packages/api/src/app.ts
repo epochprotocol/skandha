@@ -46,7 +46,7 @@ export class ApiApp {
   private db: IDbController;
   private relayers: RelayerAPI[] = [];
 
-  private testingMode = false;
+  private testingMode = true;
   private redirectRpc = false;
 
   constructor(options: EtherspotBundlerOptions) {
@@ -61,8 +61,8 @@ export class ApiApp {
   }
 
   private setupRoutes(): void {
+    this.server.post("/rpc/", this.setupRouteFor("dev"));
     if (this.testingMode) {
-      this.server.post("/rpc/", this.setupRouteFor("dev"));
       logger.info("Setup route for dev: /rpc/");
       return;
     }
@@ -79,7 +79,6 @@ export class ApiApp {
   }
 
   private setupRouteFor(network: NetworkName): RouteHandler {
-
     const relayer = new Executor({
       network,
       db: this.db,

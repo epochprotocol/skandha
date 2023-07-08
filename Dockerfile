@@ -24,4 +24,4 @@ COPY --from=build_deps /usr/app .
 
 ENV NODE_OPTIONS=--experimental-specifier-resolution=node
 
-ENTRYPOINT ["node", "./packages/cli/bin/skandha"]
+CMD ["sh", "run.sh"]
