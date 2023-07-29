@@ -46,7 +46,7 @@ export class ApiApp {
   private db: IDbController;
   private relayers: RelayerAPI[] = [];
 
-  private testingMode = true;
+  private testingMode = false;
   private redirectRpc = false;
 
   constructor(options: EtherspotBundlerOptions) {
