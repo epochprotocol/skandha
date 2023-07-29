@@ -73,6 +73,7 @@ export class BundlingService {
         to: entryPoint,
         data: txRequest,
       });
+      console.log("tx.hash: ", tx.hash);
 
       this.logger.debug(`Sent new bundle ${tx.hash}`);
 
@@ -280,8 +281,8 @@ export class BundlingService {
     console.log("beneficiary: ", beneficiary);
     const signer = this.config.getRelayer(this.network);
     console.log("signer: ", signer);
-    if(!signer){
-      throw "Cannot find signer"
+    if (!signer) {
+      throw "Cannot find signer";
     }
     const signerAddress = await signer.getAddress();
     console.log("signerAddress: ", signerAddress);
