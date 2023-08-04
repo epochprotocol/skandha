@@ -87,22 +87,34 @@ export class RocksDbController implements IDbController {
 
   async findConditional(conditions: Array<Conditions>, keys: Array<string>): Promise<any[]> {
     const searchResults: Array<any> = [];
-    const allEntries: Array<any> = await this.getMany(keys);
-
-    console.log("RocksDB Entry: ", allEntries)
-
+    const conditionsResults: Array<boolean> = []
     for (let i = 0; i < conditions.length; i++) {
       {
         const _condition = conditions[i];
-        console.log("_condition: ", _condition);
-        allEntries.forEach((entry) => {
+        await Promise.all(keys.map(async (entryKey) => {
+          try {
+          const entry = await this.get(entryKey);
           const searchResult = findVal(entry, _condition.key, _condition.expectedValue, _condition.comparisionConditions);
+          conditionsResults.push(searchResult)
           if (searchResult === true) {
-            searchResults.push(entry);
+            let _entry = entry;
+            if (typeof entry === 'string') {
+              _entry = JSON.parse(entry);
+            }
+            searchResults.push(_entry);
           }
-        })
+          } catch (error) {
+            console.log("error: ", error);
+          }
+        }))
       }
     }
+    
+    if(conditionsResults.includes(false) || conditionsResults.length === 0){
+      return []
+    }
+    console.log("searchResults: ", searchResults);
+
     return searchResults;
   }
 
