@@ -1,6 +1,6 @@
 import { NETWORK_NAME_TO_CHAIN_ID, NetworkName } from "types/lib/networks";
 import { Config } from "../config";
-import { ethers } from "ethers";
+import { BigNumber, BigNumberish, ethers } from "ethers";
 import { Logger } from "../interfaces";
 import { Executor } from "executor/lib/executor";
 import { ComparisionConditions, Conditions, IDbController } from "types/lib";
@@ -54,12 +54,25 @@ export class Eth {
         // for event based transactions
         // const advancedMempoolEntryMatchedEvent: Array<AdvancedOpMempoolEntry> = await this.advancedMempoolService.fetchAllEventConditionals(events);
         // this.logger.info("advancedMempoolEntryMatchedEvent: ", advancedMempoolEntryMatchedEvent);
+        // await Promise.all(advancedMempoolEntry.map(async (element) => {
+        // await this.advancedMempoolService.remove(element);
+        // this.advancedTransactionToMempool(element)
+        // }))
+        const nonceTracker: Map<string, BigNumberish> = new Map<string, number>();
 
-        await Promise.all(advancedMempoolEntry.map(async (element) => {
+        for (let i = 0; i < advancedMempoolEntry.length; i++) {
+            const element = advancedMempoolEntry[i];
+            let _nonce: BigNumberish = BigNumber.from(0);
+            if (nonceTracker.get(element.userOp.sender) === undefined) {
+                _nonce = await this.executor.eth.getNonce(element.userOp.sender, element.entryPoint);
+
+            } else {
+                _nonce = BigNumber.from(nonceTracker.get(element.userOp.sender)?.toString()).add(BigNumber.from(1));
+            }
             await this.advancedMempoolService.remove(element);
+            element.userOp.nonce = _nonce;
             this.advancedTransactionToMempool(element)
-        }))
-
+        }
         // await Promise.all(advancedMempoolEntryMatchedEvent.map(async (element) => {
         //     await this.advancedMempoolService.remove(element);
         //     this.advancedTransactionToMempool(element)

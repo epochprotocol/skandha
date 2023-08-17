@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, BigNumberish, ethers } from "ethers";
 import { arrayify, hexlify } from "ethers/lib/utils";
 import RpcError from "types/lib/api/errors/rpc-error";
 import * as RpcErrorCodes from "types/lib/api/errors/rpc-error-codes";
@@ -301,6 +301,9 @@ export class Eth {
    */
   async getChainId(): Promise<number> {
     return (await this.provider.getNetwork()).chainId;
+  }
+  async getNonce(address: string, entrypoint: string): Promise<BigNumberish> {
+    return (await this.userOpValidationService.getNonce(address, entrypoint));
   }
 
   /**

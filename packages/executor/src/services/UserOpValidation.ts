@@ -120,12 +120,6 @@ export class UserOpValidationService {
       this.provider
     );
 
-    const nonce = await entryPointContract.getNonce("0x4CEc9CF609f8AE37f85eeAb9B3299905e4Dc8ba0", ethers.BigNumber.from(0))
-    console.log("nonce: ", nonce);
-
-    const nonce2 = await entryPointContract.getNonce("0xb28884540Dc4FA18568Bbc8564386eBd342e3a04", ethers.BigNumber.from(0))
-    console.log("nonce2: ", nonce2);
-
     const tx = {
       to: entryPoint,
       data: entryPointContract.interface.encodeFunctionData(
@@ -505,7 +499,13 @@ export class UserOpValidationService {
     };
     return map[id] || map[0]!;
   }
-
+  async getNonce(address: string, entrypoint: string): Promise<BigNumberish> {
+    const entryPointContract = EntryPoint__factory.connect(
+      entrypoint,
+      this.provider
+    );
+    return entryPointContract.getNonce(address, ethers.BigNumber.from(0));
+  }
   isContractBanned(network: NetworkName, address: string): boolean {
     const bannedList = BannedContracts[network];
     if (!bannedList || bannedList.length == 0) {
