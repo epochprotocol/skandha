@@ -1,14 +1,10 @@
-import { IDbController } from "types/lib";
-import { CustomUserOperationStruct } from "types/src/executor/common";
-import { Conditions } from "types/src";
 import { ethers } from "ethers";
-import _ from "lodash";
-import { now } from "../utils/DateTime";
-import {
-  AdvancedMempoolEntrySerialized,
-  IAdvancedOpMempoolEntry,
-} from "types/lib/common/interfaces/advancedMempoolInterfaces";
+import { IDbController } from "types/lib";
 import { AdvancedOpMempoolEntry } from "types/lib/common/AdvancedOpMempoolEntry";
+import { AdvancedMempoolEntrySerialized, IAdvancedOpMempoolEntry } from "types/lib/common/interfaces/advancedMempoolInterfaces";
+import { Conditions } from "types/src";
+import { CustomUserOperationStruct } from "types/src/executor/common";
+import { now } from "../utils/DateTime";
 
 export class AdvancedOperationMempoolService {
   private ADVANCED_USEROP_COLLECTION_KEY: string;
@@ -146,7 +142,7 @@ export class AdvancedOperationMempoolService {
     return advancedUserOpKeys;
   }
 
-  private async fetchAll(): Promise<AdvancedOpMempoolEntry[]> {
+  public async fetchAll(): Promise<AdvancedOpMempoolEntry[]> {
     const keys = await this.fetchKeys();
     const rawEntries = await this.db
       .getMany<AdvancedOpMempoolEntry>(keys)

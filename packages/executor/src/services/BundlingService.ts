@@ -1,22 +1,25 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { BigNumber, ethers, providers } from "ethers";
-import { NetworkName } from "types/lib";
-import { EntryPoint__factory } from "types/lib/executor/contracts/factories";
-import { EntryPoint } from "types/lib/executor/contracts/EntryPoint";
 import { Mutex } from "async-mutex";
+import { AdvancedOperationMempoolService } from "common/lib/services";
+import { BigNumber, ethers, providers } from "ethers";
+import { IDbController, NETWORK_NAME_TO_CHAIN_ID, NetworkName } from "types/lib";
+import { AdvancedOpMempoolEntry } from "types/lib/common/AdvancedOpMempoolEntry";
 import { SendBundleReturn } from "types/lib/executor";
+import { EntryPoint } from "types/lib/executor/contracts/EntryPoint";
+import { EntryPoint__factory } from "types/lib/executor/contracts/factories";
 import { IMulticall3__factory } from "types/lib/executor/contracts/factories/IMulticall3__factory";
-import { getAddr } from "../utils";
+import { Executor } from "../../src/executor";
+import { Config } from "../config";
 import { MempoolEntry } from "../entities/MempoolEntry";
 import { ReputationStatus } from "../entities/interfaces";
-import { Config } from "../config";
 import { BundlingMode, Logger } from "../interfaces";
+import { getAddr } from "../utils";
+import { MempoolService } from "./MempoolService";
 import { ReputationService } from "./ReputationService";
 import {
   UserOpValidationResult,
   UserOpValidationService,
 } from "./UserOpValidation";
-import { MempoolService } from "./MempoolService";
 
 export class BundlingService {
   private mutex: Mutex;
@@ -24,6 +27,9 @@ export class BundlingService {
   private autoBundlingInterval: number;
   private autoBundlingCron?: NodeJS.Timer;
   private maxMempoolSize: number;
+  private advancedMempoolService: AdvancedOperationMempoolService;
+  private executor: Executor;
+
 
   constructor(
     private network: NetworkName,
@@ -32,13 +38,21 @@ export class BundlingService {
     private userOpValidationService: UserOpValidationService,
     private reputationService: ReputationService,
     private config: Config,
-    private logger: Logger
+    private logger: Logger,
+    executor: Executor,
+    db: IDbController
+
   ) {
     this.mutex = new Mutex();
     this.bundlingMode = "auto";
     this.autoBundlingInterval = 15 * 1000;
     this.maxMempoolSize = 2;
+    this.advancedMempoolService = new AdvancedOperationMempoolService(
+      db,
+      Number(NETWORK_NAME_TO_CHAIN_ID[network]),
+    );
     this.restartCron();
+    this.executor = executor;
   }
 
   async sendNextBundle(): Promise<SendBundleReturn | null> {
@@ -76,6 +90,21 @@ export class BundlingService {
       console.log("tx.hash: ", tx.hash);
 
       this.logger.debug(`Sent new bundle ${tx.hash}`);
+      await tx.wait();
+      const advancedMempoolEntry: Array<AdvancedOpMempoolEntry> = await this.advancedMempoolService.fetchAll();
+      const dependantOpHash: Array<string | undefined> = bundle.map((entry) => entry.userOp.advancedUserOperation?.dependant);
+
+      await Promise.all(advancedMempoolEntry.map(async (element) => {
+        // await this.advancedMempoolService.remove(element);
+        const opHash = await entryPointContract.getUserOpHash(element.userOp);
+        if (dependantOpHash.includes(opHash)) {
+          let userOp = element.userOp;
+          userOp.advancedUserOperation!.readyForExecution = true;
+          console.log('UserOperation:', userOp)
+          await this.executor.eth.sendUserOperation({ entryPoint, userOp: userOp })
+        }
+      }))
+
 
       // TODO: change to batched delete
       for (const entry of bundle) {
@@ -282,7 +311,7 @@ export class BundlingService {
     const signer = this.config.getRelayer(this.network);
     console.log("signer: ", signer);
     if (!signer) {
-      throw "Cannot find signer";
+      throw "Cannot find signer"
     }
     const signerAddress = await signer.getAddress();
     console.log("signerAddress: ", signerAddress);

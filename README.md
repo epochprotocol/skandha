@@ -34,6 +34,7 @@
 4. `docker run --mount type=bind,source="$(pwd)"/config.json,target=/usr/app/config.json,readonly -dp 14337:14337 etherspot/skandha start`
 
 
+<<<<<<< Updated upstream
 ## Additional features
 - [x] Unsafe mode - bypass opcode & stake validation
 - [x] Redirect RPC - Redirect ETH rpc calls to the underlying execution client. This is needed if you use UserOp.js
@@ -41,6 +42,15 @@
 ### CLI Options
 - `--unsafeMode` - enables unsafeMode
 - `--redirectRpc` - enables redirecting eth rpc calls
+=======
+-   [x] Unsafe mode - bypass opcode & stake validation
+-   [x] Redirect RPC - Redirect ETH rpc calls to the underlying execution client. This is needed if you use UserOp.js
+
+### CLI Options
+
+-   `--unsafeMode` - enables unsafeMode
+-   `--redirectRpc` - enables redirecting eth rpc calls
+>>>>>>> Stashed changes
 
 ## Relayer Configuration
 

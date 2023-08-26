@@ -1,18 +1,16 @@
 /* eslint-disable @typescript-eslint/explicit-member-accessibility */
-import { BigNumber, providers } from "ethers";
-import { NETWORK_NAME_TO_CHAIN_ID, NetworkName } from "types/lib";
-import { IDbController } from "types/lib";
-import { NetworkConfig } from "./config";
-import { Web3, Debug, Eth } from "./modules";
-import {
-  MempoolService,
-  UserOpValidationService,
-  BundlingService,
-  ReputationService,
-} from "./services";
-import { Config } from "./config";
-import { Logger } from "./interfaces";
 import { AdvancedOperationMempoolService } from "common/lib/services";
+import { BigNumber, providers } from "ethers";
+import { IDbController, NETWORK_NAME_TO_CHAIN_ID, NetworkName } from "types/lib";
+import { Config, NetworkConfig } from "./config";
+import { Logger } from "./interfaces";
+import { Debug, Eth, Web3 } from "./modules";
+import {
+  BundlingService,
+  MempoolService,
+  ReputationService,
+  UserOpValidationService,
+} from "./services";
 
 export interface ExecutorOptions {
   network: NetworkName;
@@ -88,7 +86,9 @@ export class Executor {
       this.userOpValidationService,
       this.reputationService,
       this.config,
-      this.logger
+      this.logger,
+      this,
+      this.db
     );
     this.web3 = new Web3(this.config);
     this.debug = new Debug(
